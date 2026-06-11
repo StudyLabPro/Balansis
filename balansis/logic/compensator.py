@@ -13,7 +13,7 @@ import math
 from typing import List, Dict, Deque, Tuple, Optional, Any, Callable
 from enum import Enum
 from dataclasses import dataclass
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from ..core.absolute import AbsoluteValue
 from ..core.eternity import EternalRatio
@@ -82,16 +82,15 @@ class CompensationStrategy(BaseModel):
         description="Maximum number of compensation records to keep in history"
     )
 
-    @validator('balance_factor')
+    model_config = ConfigDict(validate_assignment=True)
+
+    @field_validator('balance_factor')
+    @classmethod
     def validate_balance_factor(cls, v: float) -> float:
         """Ensure balance factor is in valid range."""
         if not (0.0 <= v <= 1.0):
             raise ValueError('Balance factor must be between 0.0 and 1.0')
         return v
-    
-    class Config:
-        """Pydantic configuration."""
-        validate_assignment = True
 
     @classmethod
     def high_precision(cls) -> 'CompensationStrategy':

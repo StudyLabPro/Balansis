@@ -12,7 +12,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
     requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
 
 # Package version
-__version__ = "1.0.0"
+__version__ = "0.6.1"
 
 setup(
     name="tnsim",
@@ -71,7 +71,7 @@ setup(
             "ipywidgets>=8.1.1",
         ],
         "balansis": [
-            # "balansis>=1.0.0",  # Uncomment when Balansis becomes available
+            # "balansis>=0.6.1",  # Uncomment when Balansis becomes available
         ],
         "performance": [
             "dask[complete]>=2023.11.0",

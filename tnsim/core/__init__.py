@@ -13,6 +13,6 @@ __all__ = [
     'get_global_parallel_processor'
 ]
 
-__version__ = '1.0.0'
+__version__ = '0.6.1'
 __author__ = 'TNSIM Development Team'
 __description__ = 'Theory of Null-Sum Infinite Multitudes - Core Modules'

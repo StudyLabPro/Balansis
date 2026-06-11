@@ -10,7 +10,7 @@ distributivity, and inverse properties for both addition and multiplication.
 
 from typing import List, Set, Optional, Iterator, Tuple, Union
 from abc import ABC, abstractmethod
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 import math
 from fractions import Fraction
 
@@ -38,7 +38,10 @@ class FieldElement(BaseModel):
     multiplicative_order: Optional[int] = Field(default=None, description="Order in multiplicative group")
     minimal_polynomial: Optional[List[float]] = Field(default=None, description="Minimal polynomial coefficients")
     
-    @validator('additive_order', 'multiplicative_order')
+    model_config = ConfigDict(validate_assignment=True)
+
+    @field_validator('additive_order', 'multiplicative_order')
+    @classmethod
     def validate_orders(cls, v: Optional[int]) -> Optional[int]:
         """Ensure orders are positive if specified."""
         if v is not None and v <= 0:
@@ -78,15 +81,11 @@ class FieldElement(BaseModel):
     
     def is_unit(self) -> bool:
         """Check if this element has a multiplicative inverse.
-        
+
         Returns:
             True if element is a unit (invertible)
         """
         return not self.is_zero() and self.ratio.is_stable()
-    
-    class Config:
-        """Pydantic configuration."""
-        validate_assignment = True
 
 
 class FieldOperation(ABC):

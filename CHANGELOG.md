@@ -10,9 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Balansis v0.5 (Phase 8 target): stable API, complete `linalg/` (GEMM, SVD, QR), PyTorch integration
+- Balansis v0.7 (next milestone): stable API, complete `linalg/` (GEMM, SVD, QR), PyTorch integration
 - ACT benchmark suite vs IEEE 754 and Kahan summation
 - LaTeX paper draft for arxiv submission
+
+---
+
+## [0.6.1] — 2026-06-11 — Drift Alignment Edition
+
+### Changed
+- Unified package, subpackage, API, and documentation metadata on version `0.6.1`
+- Restored compatibility shims for legacy `tnsim` import paths and Balansis integration symbols
+- Aligned public documentation with the current coverage gate (`85%`) and active packaging metadata
 
 ---
 

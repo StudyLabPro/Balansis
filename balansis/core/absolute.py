@@ -9,7 +9,7 @@ stable mathematical operations without division by zero issues.
 
 import math
 from typing import Literal, Union, Any
-from pydantic import BaseModel, validator, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 # Type aliases for clarity
 Direction = Literal[-1, 1]
@@ -18,39 +18,40 @@ Magnitude = float
 
 class AbsoluteValue(BaseModel):
     """Core mathematical type representing values with magnitude and direction.
-    
+
     AbsoluteValue replaces traditional zero with a stable representation that
     maintains both magnitude (non-negative) and direction (+1 or -1). This
     enables compensated operations that avoid mathematical instabilities.
-    
+
     Attributes:
         magnitude: Non-negative float representing the size of the value
         direction: Either +1 or -1 indicating the sign/orientation
-    
+
     Examples:
         >>> absolute_zero = AbsoluteValue(magnitude=0.0, direction=1)
         >>> positive_five = AbsoluteValue(magnitude=5.0, direction=1)
         >>> negative_three = AbsoluteValue(magnitude=3.0, direction=-1)
         >>> result = positive_five + negative_three  # Compensated addition
     """
-    
+
+    model_config = ConfigDict(
+        frozen=True,
+        validate_assignment=True,
+        arbitrary_types_allowed=False,
+    )
+
     magnitude: Magnitude = Field(
-        ..., 
-        ge=0.0, 
-        description="Non-negative magnitude of the absolute value"
+        ...,
+        ge=0.0,
+        description="Non-negative magnitude of the absolute value",
     )
     direction: Direction = Field(
-        ..., 
-        description="Direction indicator: +1 for positive, -1 for negative"
+        ...,
+        description="Direction indicator: +1 for positive, -1 for negative",
     )
-    
-    class Config:
-        """Pydantic configuration for AbsoluteValue."""
-        frozen = True  # Make instances immutable
-        validate_assignment = True
-        arbitrary_types_allowed = False
-        
-    @validator('magnitude')
+
+    @field_validator('magnitude')
+    @classmethod
     def magnitude_must_be_finite(cls, v: float) -> float:
         """Ensure magnitude is finite and non-negative."""
         if not math.isfinite(v):
@@ -58,8 +59,9 @@ class AbsoluteValue(BaseModel):
         if v < 0:
             raise ValueError('Magnitude must be non-negative')
         return v
-    
-    @validator('direction')
+
+    @field_validator('direction')
+    @classmethod
     def direction_must_be_valid(cls, v: int) -> int:
         """Ensure direction is exactly +1 or -1."""
         if v not in [-1, 1]:
@@ -202,41 +204,56 @@ class AbsoluteValue(BaseModel):
     
     def __eq__(self, other: Any) -> bool:
         """Equality comparison.
-        
-        Args:
-            other: Object to compare with
-            
-        Returns:
-            True if both magnitude and direction are equal
+
+        Two AbsoluteValues are equal when both magnitude and direction match.
+        Comparison against a finite Python number is allowed and decided by
+        signed value (``to_float()``), so that ``AbsoluteValue.absolute() == 0.0``
+        and ``AbsoluteValue.from_float(3.0) == 3`` both hold.
         """
-        if not isinstance(other, AbsoluteValue):
-            return False
-        return (self.magnitude == other.magnitude and 
-                self.direction == other.direction)
-    
-    def __lt__(self, other: 'AbsoluteValue') -> bool:
-        """Less than comparison based on signed value.
-        
-        Returns:
-            True if this value is less than the other
-        """
-        return self.to_float() < other.to_float()
-    
-    def __le__(self, other: 'AbsoluteValue') -> bool:
+        if isinstance(other, AbsoluteValue):
+            return (self.magnitude == other.magnitude and
+                    self.direction == other.direction)
+        if isinstance(other, (int, float)) and not isinstance(other, bool):
+            if not math.isfinite(other):
+                return False
+            return self.to_float() == float(other)
+        return NotImplemented
+
+    @staticmethod
+    def _to_float(other: Any) -> float:
+        if isinstance(other, AbsoluteValue):
+            return other.to_float()
+        if isinstance(other, (int, float)) and not isinstance(other, bool):
+            return float(other)
+        raise TypeError(f"Cannot compare AbsoluteValue with {type(other).__name__}")
+
+    def __lt__(self, other: Any) -> bool:
+        """Less than comparison based on signed value."""
+        try:
+            return self.to_float() < AbsoluteValue._to_float(other)
+        except TypeError:
+            return NotImplemented
+
+    def __le__(self, other: Any) -> bool:
         """Less than or equal comparison."""
-        return self.to_float() <= other.to_float()
-    
-    def __gt__(self, other: 'AbsoluteValue') -> bool:
-        """Greater than comparison based on signed value.
-        
-        Returns:
-            True if this value is greater than the other
-        """
-        return self.to_float() > other.to_float()
-    
-    def __ge__(self, other: 'AbsoluteValue') -> bool:
+        try:
+            return self.to_float() <= AbsoluteValue._to_float(other)
+        except TypeError:
+            return NotImplemented
+
+    def __gt__(self, other: Any) -> bool:
+        """Greater than comparison based on signed value."""
+        try:
+            return self.to_float() > AbsoluteValue._to_float(other)
+        except TypeError:
+            return NotImplemented
+
+    def __ge__(self, other: Any) -> bool:
         """Greater than or equal comparison."""
-        return self.to_float() >= other.to_float()
+        try:
+            return self.to_float() >= AbsoluteValue._to_float(other)
+        except TypeError:
+            return NotImplemented
     
     def __hash__(self) -> int:
         """Hash function for use in sets and dictionaries."""

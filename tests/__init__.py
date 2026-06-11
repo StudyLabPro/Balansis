@@ -5,5 +5,5 @@ ensuring mathematical correctness and stability of Absolute Compensation Theory 
 implementations.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.6.1"
 __author__ = "Balansis Development Team"

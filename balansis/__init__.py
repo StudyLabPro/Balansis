@@ -30,9 +30,10 @@ from balansis.algebra.eternity_field import EternityField
 from balansis.sets.eternal_set import EternalSet
 from balansis.sets.resolver import global_compensate
 from balansis.sets.generators import harmonic_generator, grandis_generator
+from balansis.compat import CompensatedSum, StableSoftmax, CompensatedMatMul
 # from balansis.utils.plot import PlotUtils  # Temporarily disabled
 
-__version__ = "0.5.1"
+__version__ = "0.6.1"
 __author__ = "Tikhonov Andrey"
 __email__ = "balansis@xteam.pro"
 __license__ = "MIT (non-commercial) / Commercial — see COMMERCIAL_LICENSE.md"
@@ -65,6 +66,9 @@ __all__ = [
     "global_compensate",
     "harmonic_generator",
     "grandis_generator",
+    "CompensatedSum",
+    "StableSoftmax",
+    "CompensatedMatMul",
     # "PlotUtils",  # Temporarily disabled
     "ABSOLUTE",
     "UNIT_POSITIVE",

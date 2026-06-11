@@ -1,12 +1,16 @@
 """Repository for working with infinite sets database."""
 
 import asyncio
-import asyncpg
 import json
-from datetime import datetime
-from typing import List, Dict, Any, Optional
 import logging
 import os
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+try:
+    import asyncpg
+except ImportError:  # pragma: no cover - optional dependency
+    asyncpg = None  # type: ignore[assignment]
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +34,11 @@ class DatabaseConnection:
     
     async def initialize(self):
         """Initialize connection pool."""
+        if asyncpg is None:
+            raise RuntimeError(
+                "asyncpg is required for TNSIM database operations. "
+                "Install the database extras to enable repository access."
+            )
         try:
             self.pool = await asyncpg.create_pool(
                 self.connection_string,

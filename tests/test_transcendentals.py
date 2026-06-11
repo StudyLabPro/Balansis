@@ -62,8 +62,9 @@ def test_gemm_basic():
         [AbsoluteValue.from_float(5.0), AbsoluteValue.from_float(6.0)],
         [AbsoluteValue.from_float(7.0), AbsoluteValue.from_float(8.0)],
     ]
-    c = matmul(a, b)
+    c, compensation = matmul(a, b)
     assert c[0][0].to_float() == 1.0 * 5.0 + 2.0 * 7.0
     assert c[0][1].to_float() == 1.0 * 6.0 + 2.0 * 8.0
     assert c[1][0].to_float() == 3.0 * 5.0 + 4.0 * 7.0
     assert c[1][1].to_float() == 3.0 * 6.0 + 4.0 * 8.0
+    assert compensation >= 1.0

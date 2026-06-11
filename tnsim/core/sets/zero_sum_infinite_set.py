@@ -1,29 +1,35 @@
 """Main class for working with infinite sets within the TNSIM framework."""
 
-import numpy as np
-from typing import List, Optional, Union, Dict, Any
-from decimal import Decimal, getcontext
-import uuid
-from datetime import datetime
+from __future__ import annotations
 
-# Import from Balansis library
+from datetime import datetime
+from decimal import Decimal, getcontext
+from typing import Any, Dict, List, Optional, Union
+import uuid
+
+import numpy as np
+
 try:
-    from balansis.core.operations import compensated_sum, compensated_matmul
-    from balansis.logic.compensator import Compensator
-except ImportError:
-    # Fallbacks for when Balansis is not available
-    class Compensator:
-        def compensate(self, a, b):
-            return a + b
-        
-        def stabilize(self, x):
-            return x
-    
-    def compensated_sum(arr):
-        return np.sum(arr)
+    from balansis import AbsoluteValue, Operations
+except ImportError:  # pragma: no cover - optional integration
+    AbsoluteValue = None  # type: ignore[assignment]
+    Operations = None  # type: ignore[assignment]
 
 # Set precision for Decimal
 getcontext().prec = 50
+
+def _to_decimal(value: Union[float, Decimal, int]) -> Decimal:
+    return value if isinstance(value, Decimal) else Decimal(str(value))
+
+
+def _compensated_sum(values: np.ndarray) -> float:
+    if Operations is None or AbsoluteValue is None:
+        return float(np.sum(values))
+
+    absolute_values = [AbsoluteValue.from_float(float(v)) for v in np.asarray(values)]
+    result, _ = Operations.sequence_sum(absolute_values)
+    return result.to_float()
+
 
 class ZeroSumInfiniteSet:
     """Class for representing infinite sets within the TNSIM framework.
@@ -31,10 +37,15 @@ class ZeroSumInfiniteSet:
     Implements the ⊕ operation and compensation principles for working with infinite sets.
     """
     
-    def __init__(self, elements: List[Union[float, Decimal]], 
-                 set_type: str = 'custom',
-                 name: Optional[str] = None,
-                 properties: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        elements: Optional[List[Union[float, Decimal, int]]] = None,
+        set_type: str = "custom",
+        name: Optional[str] = None,
+        properties: Optional[Dict[str, Any]] = None,
+        series_type: Optional[str] = None,
+        formula: Optional[str] = None,
+    ) -> None:
         """Initialize infinite set.
         
         Args:
@@ -43,23 +54,29 @@ class ZeroSumInfiniteSet:
             name: Set name
             properties: Additional set properties
         """
+        effective_type = series_type or set_type
         self.id = str(uuid.uuid4())
-        self.elements = np.array([Decimal(str(x)) for x in elements])
-        self.set_type = set_type
-        self.name = name or f"{set_type}_set_{self.id[:8]}"
-        self.properties = properties or {}
+        self.elements = np.array([_to_decimal(x) for x in (elements or [])], dtype=object)
+        self.set_type = effective_type
+        self.series_type = effective_type
+        self.name = name or f"{effective_type}_set_{self.id[:8]}"
+        self.properties = dict(properties or {})
+        if formula is not None:
+            self.properties.setdefault("formula", formula)
         self.created_at = datetime.now()
-        
-        # Initialize compensator from Balansis
-        self.compensator = Compensator()
         self._compensating_set = None
         self._cached_sum = None
         
     def __repr__(self) -> str:
         return f"ZeroSumInfiniteSet(name='{self.name}', type='{self.set_type}', elements={len(self.elements)})"
     
-    def zero_sum_operation(self, other: 'ZeroSumInfiniteSet', 
-                          method: str = 'compensated') -> Decimal:
+    def zero_sum_operation(
+        self,
+        other: Optional["ZeroSumInfiniteSet"] = None,
+        method: str = "compensated",
+        tolerance: Optional[float] = None,
+        max_iterations: Optional[int] = None,
+    ) -> Union[Decimal, Dict[str, Any]]:
         """Execute ⊕ operation between two sets.
         
         Args:
@@ -69,14 +86,32 @@ class ZeroSumInfiniteSet:
         Returns:
             Result of ⊕ operation
         """
-        if method == 'direct':
+        if other is None:
+            total = self._self_sum(method)
+            tol = Decimal(str(tolerance if tolerance is not None else 1e-10))
+            return {
+                "sum": total,
+                "method": method,
+                "compensation_error": abs(total),
+                "iterations": max_iterations or 1,
+                "stability_factor": 1.0,
+                "numerical_precision": float(-np.log10(float(abs(total)) + 1e-16)),
+                "tolerance": tol,
+            }
+
+        if method == "direct":
             return self._direct_sum(other)
-        elif method == 'compensated':
+        if method == "compensated":
             return self._compensated_sum(other)
-        elif method == 'stabilized':
+        if method == "stabilized":
             return self._stabilized_sum(other)
-        else:
-            raise ValueError(f"Unknown method: {method}")
+        raise ValueError(f"Unknown method: {method}")
+
+    def _self_sum(self, method: str) -> Decimal:
+        if method == "direct":
+            return Decimal(str(sum(self.elements)))
+        values = np.asarray([float(x) for x in self.elements], dtype=np.float64)
+        return Decimal(str(_compensated_sum(values)))
     
     def _direct_sum(self, other: 'ZeroSumInfiniteSet') -> Decimal:
         """Direct summation of set elements."""
@@ -84,23 +119,18 @@ class ZeroSumInfiniteSet:
         sum_b = sum(other.elements)
         return sum_a + sum_b
     
-    def _compensated_sum(self, other: 'ZeroSumInfiniteSet') -> Decimal:
+    def _compensated_sum(self, other: "ZeroSumInfiniteSet") -> Decimal:
         """Compensated summation through Balansis."""
-        sum_a = float(sum(self.elements))
-        sum_b = float(sum(other.elements))
-        result = self.compensator.compensate(sum_a, sum_b)
-        return Decimal(str(result))
+        sum_a = _compensated_sum(np.asarray([float(x) for x in self.elements], dtype=np.float64))
+        sum_b = _compensated_sum(np.asarray([float(x) for x in other.elements], dtype=np.float64))
+        return Decimal(str(sum_a + sum_b))
     
-    def _stabilized_sum(self, other: 'ZeroSumInfiniteSet') -> Decimal:
+    def _stabilized_sum(self, other: "ZeroSumInfiniteSet") -> Decimal:
         """Stabilized summation with additional compensation."""
-        # Apply stabilization to each set
-        stabilized_a = self.compensator.stabilize(self.elements.astype(float))
-        stabilized_b = self.compensator.stabilize(other.elements.astype(float))
-        
-        # Compensated summation
-        sum_a = compensated_sum(stabilized_a)
-        sum_b = compensated_sum(stabilized_b)
-        
+        stabilized_a = np.asarray([float(x) for x in self.elements], dtype=np.float64)
+        stabilized_b = np.asarray([float(x) for x in other.elements], dtype=np.float64)
+        sum_a = _compensated_sum(stabilized_a)
+        sum_b = _compensated_sum(stabilized_b)
         return Decimal(str(sum_a + sum_b))
     
     def find_compensating_set(self, method: str = 'direct') -> 'ZeroSumInfiniteSet':
@@ -158,12 +188,11 @@ class ZeroSumInfiniteSet:
             {**self.properties, 'compensates': self.id, 'method': 'iterative'}
         )
     
-    def _adaptive_compensating_set(self) -> 'ZeroSumInfiniteSet':
+    def _adaptive_compensating_set(self) -> "ZeroSumInfiniteSet":
         """Adaptive search for compensating set using Balansis."""
-        # Use compensator for adaptive search
-        stabilized_elements = self.compensator.stabilize(self.elements.astype(float))
-        compensating_elements = [-self.compensator.stabilize(x) for x in stabilized_elements]
-        
+        stabilized_elements = np.asarray([float(x) for x in self.elements], dtype=np.float64)
+        compensating_elements = [-float(x) for x in stabilized_elements]
+
         return ZeroSumInfiniteSet(
             compensating_elements,
             f"adaptive_compensating_{self.set_type}",
@@ -171,7 +200,11 @@ class ZeroSumInfiniteSet:
             {**self.properties, 'compensates': self.id, 'method': 'adaptive'}
         )
     
-    def validate_zero_sum(self, tolerance: Decimal = Decimal('1e-10')) -> Dict[str, Any]:
+    def validate_zero_sum(
+        self,
+        tolerance: Decimal = Decimal("1e-10"),
+        detailed: bool = False,
+    ) -> Dict[str, Any]:
         """Validate zero sum with compensating set.
         
         Args:
@@ -185,16 +218,20 @@ class ZeroSumInfiniteSet:
         
         is_zero_sum = abs(result) < tolerance
         
-        return {
-            'is_zero_sum': is_zero_sum,
-            'result': result,
-            'tolerance': tolerance,
-            'error_margin': abs(result),
-            'compensating_set_id': compensating.id,
-            'validation_timestamp': datetime.now()
+        payload = {
+            "is_zero_sum": is_zero_sum,
+            "result": result,
+            "tolerance": tolerance,
+            "error_margin": abs(result),
+            "compensating_set_id": compensating.id,
+            "validation_timestamp": datetime.now(),
         }
-    
-    def get_partial_sum(self, n_elements: int) -> Decimal:
+        if detailed:
+            payload["element_count"] = len(self.elements)
+            payload["partial_sum"] = self.get_partial_sum(len(self.elements))
+        return payload
+
+    def get_partial_sum(self, n_elements: int, start: int = 0) -> Decimal:
         """Get partial sum of first n elements.
         
         Args:
@@ -203,12 +240,23 @@ class ZeroSumInfiniteSet:
         Returns:
             Partial sum
         """
-        if n_elements > len(self.elements):
-            n_elements = len(self.elements)
-        
-        return sum(self.elements[:n_elements])
-    
-    def convergence_analysis(self, max_terms: int = 1000) -> Dict[str, Any]:
+        if start < 0:
+            raise ValueError("start must be non-negative")
+        if n_elements < 0:
+            raise ValueError("n_elements must be non-negative")
+        end = min(n_elements, len(self.elements))
+        return sum(self.elements[start:end])
+
+    def get_element(self, index: int) -> Decimal:
+        if index < 0 or index >= len(self.elements):
+            raise IndexError("element index out of range")
+        return self.elements[index]
+
+    def convergence_analysis(
+        self,
+        max_terms: int = 1000,
+        analysis_methods: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
         """Analyze series convergence.
         
         Args:
@@ -234,11 +282,12 @@ class ZeroSumInfiniteSet:
             variance = float('inf')
         
         return {
-            'is_convergent': is_convergent,
-            'partial_sums': partial_sums,
-            'variance': variance,
-            'final_sum': partial_sums[-1] if partial_sums else 0,
-            'n_terms_analyzed': n_terms
+            "is_convergent": is_convergent,
+            "partial_sums": partial_sums,
+            "variance": variance,
+            "final_sum": partial_sums[-1] if partial_sums else 0,
+            "n_terms_analyzed": n_terms,
+            "analysis_methods": analysis_methods or [],
         }
     
     def to_dict(self) -> Dict[str, Any]:
@@ -267,25 +316,34 @@ class ZeroSumInfiniteSet:
         return obj
 
     @staticmethod
-    def create_harmonic_series(n_terms: int = 1000) -> 'ZeroSumInfiniteSet':
+    def create_harmonic_series(
+        n_terms: int = 1000,
+        p: float = 1.0,
+    ) -> "ZeroSumInfiniteSet":
         """Create harmonic series."""
-        elements = [Decimal(1) / Decimal(i) for i in range(1, n_terms + 1)]
+        elements = [Decimal(1) / (Decimal(i) ** Decimal(str(p))) for i in range(1, n_terms + 1)]
         return ZeroSumInfiniteSet(
             elements,
             'harmonic',
             'Harmonic Series',
-            {'formula': '1/n', 'divergent': True}
+            {'formula': f'1/n^{p}', 'divergent': p <= 1.0, 'p': p}
         )
     
     @staticmethod
-    def create_alternating_series(n_terms: int = 1000) -> 'ZeroSumInfiniteSet':
+    def create_alternating_series(
+        n_terms: int = 1000,
+        p: float = 1.0,
+    ) -> "ZeroSumInfiniteSet":
         """Create alternating series."""
-        elements = [Decimal((-1) ** i) / Decimal(i + 1) for i in range(n_terms)]
+        elements = [
+            Decimal((-1) ** i) / (Decimal(i + 1) ** Decimal(str(p)))
+            for i in range(n_terms)
+        ]
         return ZeroSumInfiniteSet(
             elements,
             'alternating',
             'Alternating Series',
-            {'formula': '(-1)^n/(n+1)', 'convergent': True}
+            {'formula': f'(-1)^n/(n+1)^{p}', 'convergent': True, 'p': p}
         )
     
     @staticmethod

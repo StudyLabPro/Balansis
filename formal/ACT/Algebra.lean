@@ -8,7 +8,7 @@
     S3: (EternalRatio, +, *) forms a field
 
   Authors: Balansis Team
-  Version: 1.0.0
+  Version: 0.6.1
 -/
 
 import ACT.Absolute

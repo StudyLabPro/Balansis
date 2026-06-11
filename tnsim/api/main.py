@@ -7,7 +7,9 @@ import logging
 from typing import Dict, Any
 
 from .routes import zerosum_router
-from ..database.connection import get_database_connection, close_database_connection
+from .. import __version__ as TNSIM_VERSION
+from ..database.connection import close_database_connection
+from ..database.repository import InfiniteSetRepository
 from ..core import get_global_cache, get_global_parallel_processor
 
 # Logging configuration
@@ -39,7 +41,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="TNSIM API",
     description="API for Theory of Null Sum Infinite Sets",
-    version="1.0.0",
+    version=TNSIM_VERSION,
     lifespan=lifespan
 )
 
@@ -61,7 +63,7 @@ async def root() -> Dict[str, Any]:
     """Root endpoint."""
     return {
         "message": "TNSIM API - Theory of Null Sum Infinite Sets",
-        "version": "1.0.0",
+        "version": TNSIM_VERSION,
         "docs": "/docs",
         "redoc": "/redoc"
     }
@@ -71,10 +73,10 @@ async def root() -> Dict[str, Any]:
 async def health_check() -> Dict[str, str]:
     """Service health check."""
     try:
-        # Check database connection
-        db = await get_database_connection()
-        await db.execute("SELECT 1")
-        
+        repo = InfiniteSetRepository()
+        db_status = await repo.health_check()
+        if db_status.get("status") != "healthy":
+            raise RuntimeError(db_status.get("error", "database health check failed"))
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
         logger.error(f"Health check error: {e}")
