@@ -12,7 +12,7 @@ Balansis is a Python mathematical library implementing **Absolute Compensation T
 # Install dependencies
 poetry install
 
-# Run all tests (coverage >= 95% enforced)
+# Run all tests (coverage >= 85% enforced)
 pytest
 
 # Run a specific test file
@@ -103,7 +103,7 @@ Lean 4 formal verification of ACT axioms. Entry point: `formal/BalansisFormal.le
 2. **Direction constraint**: `direction` is always exactly `1` or `-1` (not `0`, not `0.5`). The conftest creates some with `0.5` for edge-case testing, but the validator enforces `{-1, 1}`.
 3. **No division by Absolute**: `EternalRatio` construction raises `ValueError` if denominator `magnitude == 0.0`. This is the type-level enforcement of division safety.
 4. **Compensated ops return tuples**: `Operations.*` methods return `(AbsoluteValue, float)`. The `Compensator` unwraps these and exposes simpler `AbsoluteValue`-returning methods.
-5. **Coverage gate**: `pytest` fails if coverage drops below 95%. All new code must be tested.
+5. **Coverage gate**: `pytest` fails if coverage drops below 85%. All new code must be tested.
 6. **Mypy strict**: All functions require type annotations; `disallow_untyped_defs = true`.
 
 ## Module Constants (from `balansis/__init__.py`)

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     import plotly.graph_objects as go
 import math
 from enum import Enum
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 # Conditional imports for plotting dependencies
 try:
@@ -146,10 +146,8 @@ class PlotConfig(BaseModel):
         if not 0 <= v <= 1:
             raise ValueError('Alpha must be between 0 and 1')
         return v
-    
-    class Config:
-        """Pydantic configuration."""
-        validate_assignment = True
+
+    model_config = ConfigDict(validate_assignment=True)
 
 
 class PlotUtils:

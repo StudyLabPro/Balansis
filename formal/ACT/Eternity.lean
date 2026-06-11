@@ -6,7 +6,7 @@
   division and the concept of infinity with a stable algebraic structure.
 
   Authors: Balansis Team
-  Version: 1.0.0
+  Version: 0.6.1
 -/
 
 import ACT.Absolute

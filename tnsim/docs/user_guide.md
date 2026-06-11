@@ -43,7 +43,7 @@ TNSIM (Theory of Null-Sum Infinite Multitudes) is a Python library for working w
 - SciPy >= 1.7.0
 - Pandas >= 1.3.0 (optional)
 - PyTorch >= 1.9.0 (optional, for neural network integration)
-- Balansis >= 1.0.0 (optional, for high-precision computations)
+- Balansis >= 0.6.1 (optional, for high-precision computations)
 
 ### Installation via pip
 

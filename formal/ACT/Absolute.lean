@@ -6,7 +6,7 @@
   magnitude 0 and serves as the additive identity.
 
   Authors: Balansis Team
-  Version: 1.0.0
+  Version: 0.6.1
 -/
 
 namespace ACT

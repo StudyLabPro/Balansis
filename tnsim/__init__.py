@@ -18,7 +18,7 @@ Usage example:
 """
 
 # Package version
-__version__ = "1.0.0"
+__version__ = "0.6.1"
 __author__ = "TNSIM Team"
 __email__ = "contact@tnsim.org"
 __description__ = "Theory of Zero-Sum Infinite Sets"

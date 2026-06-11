@@ -42,22 +42,31 @@ class CompensationMetrics:
 class BalansisCompensator:
     """Compensator using Balansis algorithms for enhanced precision."""
     
-    def __init__(self, tolerance: float = 1e-12, max_iterations: int = 1000):
+    def __init__(
+        self,
+        tolerance: float = 1e-12,
+        max_iterations: int = 1000,
+        precision: Optional[float] = None,
+    ):
         """Initialize the Balansis compensator.
         
         Args:
             tolerance: Tolerance for compensation convergence
             max_iterations: Maximum number of compensation iterations
         """
-        self.tolerance = tolerance
+        self.tolerance = precision if precision is not None else tolerance
+        self.precision = self.tolerance
         self.max_iterations = max_iterations
         self.use_balansis = BALANSIS_AVAILABLE
+        self.balansis_available = BALANSIS_AVAILABLE
         self.metrics_history: List[CompensationMetrics] = []
         
         if self.use_balansis:
-            self.compensated_sum = CompensatedSum(tolerance=tolerance)
+            self._balansis_sum = CompensatedSum(tolerance=self.tolerance)
             self.stable_softmax = StableSoftmax()
             self.compensated_matmul = CompensatedMatMul()
+        else:
+            self._balansis_sum = None
     
     def compensated_sum(self, 
                        values: np.ndarray, 
@@ -103,7 +112,7 @@ class BalansisCompensator:
             compensating_values = self._generate_compensating_values(values)
         
         # Use Balansis compensated summation
-        result = self.compensated_sum(values + compensating_values)
+        result = self._balansis_sum(values + compensating_values)
         
         # Compute metrics
         metrics = self._compute_metrics(values, result, compensating_values)
@@ -317,8 +326,8 @@ if TORCH_AVAILABLE:
             
             # Apply TNSIM compensation
             compensated_output, metrics = self.compensator.compensated_sum(
-                attention_output, 
-                compensating_values=None
+                attention_output,
+                compensating_values=None,
             )
             
             return compensated_output, attention_weights, metrics
@@ -326,7 +335,10 @@ if TORCH_AVAILABLE:
         def _compensated_residual(self, output: torch.Tensor, residual: torch.Tensor) -> torch.Tensor:
             """Residual connection with compensation."""
             # Apply TNSIM principles to residual connection
-            combined_output, _ = self.compensator.compensated_sum(output, -residual)
+            combined_output, _ = self.compensator.compensated_sum(
+                output,
+                compensating_values=-residual,
+            )
             return combined_output + residual  # Add back for gradient preservation
         
         def _evaluate_zero_sum_quality(self, tensor: torch.Tensor) -> float:

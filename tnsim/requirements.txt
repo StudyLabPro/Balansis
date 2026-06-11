@@ -66,7 +66,7 @@ requests==2.31.0
 python-multipart==0.0.6
 
 # Optional: Balansis integration (if available)
-# balansis>=1.0.0
+# balansis>=0.6.1
 
 # Development dependencies
 # These dependencies are only needed for development

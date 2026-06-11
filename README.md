@@ -1,6 +1,6 @@
-[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/XTeam-Pro/Balansis)
+[![Version](https://img.shields.io/badge/version-0.6.1-blue.svg)](https://github.com/XTeam-Pro/Balansis)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://python.org)
-[![Coverage](https://img.shields.io/badge/coverage-95%25%2B-brightgreen.svg)](https://github.com/XTeam-Pro/Balansis)
+[![Coverage](https://img.shields.io/badge/coverage-85%25%2B-brightgreen.svg)](https://github.com/XTeam-Pro/Balansis)
 [![Lean4](https://img.shields.io/badge/Lean4-12%20axioms%20proven-blueviolet.svg)](./formal/)
 [![License](https://img.shields.io/badge/license-MIT%20%2F%20Commercial-blue.svg)](./COMMERCIAL_LICENSE.md)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -196,7 +196,7 @@ assets = ledger.account_balance("assets")  # AbsoluteValue — per-account balan
 
 ## Formal Verification
 
-Version 0.2.0 ships a complete Lean4 formalization of ACT using Mathlib v4.28.0. All 12 axioms are machine-checked — **0 `sorry`, 0 errors, 0 admitted axioms**.
+Version 0.6.1 ships a complete Lean4 formalization of ACT using Mathlib v4.28.0. All 12 axioms are machine-checked — **0 `sorry`, 0 errors, 0 admitted axioms**.
 
 | Group | Lean4 file | Proven axioms |
 |-------|-----------|---------------|
@@ -222,7 +222,7 @@ cd formal && lake build
 ## Testing
 
 ```bash
-# Run full test suite with coverage enforcement (>= 95% required)
+# Run full test suite with coverage enforcement (>= 85% required)
 poetry run pytest
 
 # Run specific modules
@@ -243,7 +243,7 @@ poetry run flake8 balansis/
 poetry run pre-commit run --all-files
 ```
 
-The CI configuration enforces `--cov-fail-under=95` — the build fails if coverage drops below 95%.
+The CI configuration enforces `--cov-fail-under=85` — the build fails if coverage drops below 85%.
 
 ---
 

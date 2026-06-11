@@ -9,23 +9,23 @@ providing stable mathematical relationships without traditional division issues.
 
 import math
 from typing import Any, Optional
-from pydantic import BaseModel, validator, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .absolute import AbsoluteValue
 
 
 class EternalRatio(BaseModel):
     """Structural ratio between two AbsoluteValues.
-    
+
     EternalRatio represents the relationship between two AbsoluteValues as a
     stable, invariant ratio that maintains its properties across mathematical
     transformations. This replaces traditional division with a more stable
     structural relationship.
-    
+
     Attributes:
         numerator: The AbsoluteValue in the numerator position
         denominator: The AbsoluteValue in the denominator position (cannot be Absolute)
-    
+
     Examples:
         >>> a = AbsoluteValue(magnitude=6.0, direction=1)
         >>> b = AbsoluteValue(magnitude=2.0, direction=1)
@@ -33,23 +33,24 @@ class EternalRatio(BaseModel):
         >>> ratio.value()  # Returns 3.0
         >>> ratio.is_stable()  # Returns True
     """
-    
+
+    model_config = ConfigDict(
+        frozen=True,
+        validate_assignment=True,
+        arbitrary_types_allowed=True,
+    )
+
     numerator: AbsoluteValue = Field(
-        ..., 
-        description="AbsoluteValue in the numerator position"
+        ...,
+        description="AbsoluteValue in the numerator position",
     )
     denominator: AbsoluteValue = Field(
-        ..., 
-        description="AbsoluteValue in the denominator position (non-Absolute)"
+        ...,
+        description="AbsoluteValue in the denominator position (non-Absolute)",
     )
-    
-    class Config:
-        """Pydantic configuration for EternalRatio."""
-        frozen = True  # Make instances immutable
-        validate_assignment = True
-        arbitrary_types_allowed = True
-    
-    @validator('denominator')
+
+    @field_validator('denominator')
+    @classmethod
     def denominator_not_absolute(cls, v: AbsoluteValue) -> AbsoluteValue:
         """Ensure denominator is not Absolute (magnitude != 0).
         

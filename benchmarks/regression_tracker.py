@@ -171,7 +171,7 @@ class RegressionTracker:
 
         if update:
             new_baselines = {
-                "version": "0.5.0",
+                "version": "0.6.1",
                 "timestamp": time.strftime("%Y-%m-%d"),
                 "accuracy": accuracy_metrics,
                 "linalg": linalg_metrics,

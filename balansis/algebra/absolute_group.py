@@ -10,7 +10,7 @@ and inverse properties while handling Absolute elements appropriately.
 
 from typing import List, Set, Optional, Iterator, Tuple
 from abc import ABC, abstractmethod
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 import math
 
 from ..core.absolute import AbsoluteValue
@@ -33,31 +33,30 @@ class GroupElement(BaseModel):
     order: Optional[int] = Field(default=None, description="Order of element in group")
     conjugacy_class: Optional[str] = Field(default=None, description="Conjugacy class ID")
     
-    @validator('order')
+    model_config = ConfigDict(validate_assignment=True)
+
+    @field_validator('order')
+    @classmethod
     def validate_order(cls, v: Optional[int]) -> Optional[int]:
         """Ensure order is positive if specified."""
         if v is not None and v <= 0:
             raise ValueError('Element order must be positive')
         return v
-    
+
     def __hash__(self) -> int:
         """Hash based on underlying AbsoluteValue."""
         return hash(self.value)
-    
+
     def __eq__(self, other) -> bool:
         """Equality based on underlying AbsoluteValue."""
         if not isinstance(other, GroupElement):
             return False
         return self.value == other.value
-    
+
     def __repr__(self) -> str:
         """String representation for debugging."""
         order_str = f", order={self.order}" if self.order else ""
         return f"GroupElement({self.value}{order_str})"
-    
-    class Config:
-        """Pydantic configuration."""
-        validate_assignment = True
 
 
 class GroupOperation(ABC):

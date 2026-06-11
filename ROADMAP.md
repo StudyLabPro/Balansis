@@ -2,12 +2,12 @@
 
 Strategic development plan for Balansis and Absolute Compensation Theory (ACT).
 
-**Last Updated**: 2026-02-18
-**Current Version**: 0.2.0
+**Last Updated**: 2026-06-11
+**Current Version**: 0.6.1
 
 ---
 
-## Current State (Q1 2026)
+## Current State (Q2 2026)
 
 | Module | Status | Notes |
 |--------|--------|-------|
@@ -26,23 +26,18 @@ Strategic development plan for Balansis and Absolute Compensation Theory (ACT).
 
 ## Roadmap
 
-### v0.3.0 — "Stabilization" (Q2 2026 target)
+### v0.6.1 — "Alignment Release" (completed in Q2 2026)
 
-**Goal**: Stable, benchmarked foundation for research and production use.
+**Goal**: Remove version/API/documentation drift and restore a coherent public surface.
 
-- Complete `linalg/` implementation (GEMM, SVD, QR with full test coverage)
-- ACT benchmark suite vs IEEE 754, Kahan summation, Python Decimal
-- Performance profiling and critical path optimization
-- Coverage: 95%+ on all modules (not just core)
-- Full API reference documentation (100% public API)
-- Python 3.10–3.12 compatibility matrix in CI
+- Unified versioning on `0.6.1` across library, `tnsim`, formal artifacts, and package metadata
+- Restored compatibility import paths for legacy `tnsim` modules
+- Reintroduced Balansis compatibility symbols used by older integrations
+- Aligned documentation with the active coverage gate and current package state
 
-**Gate criteria**:
-- [ ] All benchmarks pass (ACT stability 10x+ better on pathological inputs)
-- [ ] Coverage >= 95%
-- [ ] Documentation covers 100% public API
+- **Outcome**: metadata, compatibility shims, and documentation are synchronized.
 
-### v0.5.0 — "Research Ready" (Q3–Q4 2026, Phase 8 target)
+### v0.7.0 — "Research Ready" (Q3–Q4 2026 target)
 
 **Goal**: Submit ACT paper to arxiv. Validate PyTorch integration.
 
@@ -57,7 +52,7 @@ Strategic development plan for Balansis and Absolute Compensation Theory (ACT).
 - [ ] MagicBrain training stability measurably improved
 - [ ] PyPI package published as `balansis`
 
-### v0.7.0 — "Production" (Phase 10 target, Q1 2027)
+### v0.8.0 — "Production" (Q1 2027 target)
 
 **Goal**: Production-ready, used in StudyNinja cognitive simulation.
 
@@ -122,13 +117,13 @@ balansis/
 ├── core/          # AbsoluteValue, EternalRatio (stable)
 ├── logic/         # Algebraic structures: AbsoluteGroup, EternityField (stable)
 ├── algebra/       # Extended algebraic operations
-├── linalg/        # gemm.py, svd.py, qr.py (alpha -> v0.3.0 target)
-├── ml/            # EternalOptimizer, EternalTorchOptimizer (alpha -> v0.5.0 target)
+├── linalg/        # gemm.py, svd.py, qr.py (alpha -> v0.7.0 target)
+├── ml/            # EternalOptimizer, EternalTorchOptimizer (alpha -> v0.7.0 target)
 ├── finance/       # ledger.py (alpha)
 ├── sets/          # eternal_set.py (alpha)
 ├── numpy_integration.py  # Vectorized ACT ops (present)
 ├── memory/        # arena.py (present)
-└── benchmarks/    # (planned v0.3.0)
+└── benchmarks/    # (planned v0.7.0)
 formal/
 └── BalansisFormal/  # Lean4 proofs (complete, 0 sorry)
     ├── Direction.lean
@@ -152,9 +147,9 @@ Key integration points:
 
 ## Quality Standards
 
-| Metric | Current | Target (v0.3.0) | Target (v1.0.0) |
+| Metric | Current | Target (v0.7.0) | Target (v1.0.0) |
 |--------|---------|-----------------|-----------------|
-| Test coverage | 95%+ (core) | 95%+ (all modules) | 95%+ (all) |
+| Test coverage | 85%+ (shipped modules) | 90%+ (all modules) | 95%+ (all) |
 | Lean4 axioms proven | 12/12 | + compensated ops proofs | + convergence bounds |
 | PyPI published | No | No | Yes |
 | Benchmarks | None | vs IEEE 754, Kahan | vs MPFR, Decimal |

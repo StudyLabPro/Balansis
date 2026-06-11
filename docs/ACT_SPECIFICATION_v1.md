@@ -1,6 +1,6 @@
 # ACT (Absolute Compensation Theory) — Formal Specification v1.0
 
-**Version:** 1.0.0
+**Version:** 0.6.1
 **Date:** 2026-02-17
 **Authors:** Balansis Team
 

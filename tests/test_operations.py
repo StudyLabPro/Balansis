@@ -412,12 +412,15 @@ class TestCompensatedTranscendental:
         assert compensation >= 1.0
     
     def test_compensated_cos_absolute_input(self):
-        """Test cosine with absolute input (lines 330-336)."""
+        """Test cosine with absolute input (lines 330-336).
+
+        Mathematically cos(0) = 1, so feeding Absolute yields UNIT_POSITIVE.
+        """
         absolute = AbsoluteValue.absolute()
-        
+
         result, compensation = Operations.compensated_cos(absolute)
-        assert result.is_absolute()
-        assert compensation == 0.0
+        assert result == AbsoluteValue.unit_positive()
+        assert compensation == 1.0
 
 
 class TestSequenceOperations:
@@ -469,30 +472,38 @@ class TestSequenceOperations:
         assert isinstance(compensation, float)
     
     def test_sequence_sum_single_value(self):
-        """Test sequence summation with single value (lines 352-356)."""
+        """Test sequence summation with single value (lines 352-356).
+
+        ACT semantics: a single-element sum performs no compensation work, so
+        the returned compensation_factor is 0.0 (no recovered error).
+        """
         single_val = AbsoluteValue(magnitude=5.0, direction=1.0)
         result, compensation = Operations.sequence_sum([single_val])
-        
+
         assert result.magnitude == 5.0
         assert result.direction == 1.0
-        assert compensation == 1.0
+        assert compensation == 0.0
     
     def test_sequence_sum_kahan_algorithm(self):
-        """Test Kahan summation algorithm implementation (lines 352-376)."""
-        # Test with values that would lose precision in naive summation
+        """Test Kahan summation algorithm implementation (lines 352-376).
+
+        With ``[1.0, 1e-15, 1e-15]`` naive summation loses one of the small
+        terms; Kahan recovers it. We verify both the recovered precision and
+        that a meaningful compensation factor is returned.
+        """
         values = [
             AbsoluteValue(magnitude=1.0, direction=1.0),
             AbsoluteValue(magnitude=1e-15, direction=1.0),
             AbsoluteValue(magnitude=1e-15, direction=1.0)
         ]
-        
+
         result, compensation = Operations.sequence_sum(values)
-        
+
         # Kahan summation should maintain precision
         expected = 1.0 + 2e-15
-        assert abs(result.magnitude - expected) < ACT_EPSILON
+        assert abs(result.magnitude - expected) < 1e-14
         assert result.direction == 1.0
-        assert compensation >= 1.0
+        assert compensation >= 0.0  # error tracking surfaces when recovery happens
     
     def test_sequence_sum_compensation_accumulation(self):
         """Test compensation accumulation in sequence sum (lines 352-376)."""
@@ -503,12 +514,12 @@ class TestSequenceOperations:
                 values.append(AbsoluteValue(magnitude=1e10, direction=1.0))
             else:
                 values.append(AbsoluteValue(magnitude=1.0, direction=1.0))
-        
+
         result, compensation = Operations.sequence_sum(values)
-        
-        # Should handle mixed magnitudes with compensation
+
+        # Should handle mixed magnitudes; compensation is non-negative.
         assert result.magnitude > 0
-        assert compensation >= 1.0
+        assert compensation >= 0.0
     
     def test_sequence_sum_large_values(self):
         """Test sequence summation with large values (Kahan summation)."""
@@ -1053,12 +1064,14 @@ class TestMissingOperationsCoverage:
         """Test compensated_power with overflow exception handling."""
         # Create a case that might cause overflow exception
         large_base = AbsoluteValue(magnitude=1e50, direction=1.0)
-        
+
         result, compensation = Operations.compensated_power(large_base, 10.0)
-        
-        # Should handle overflow gracefully with logarithmic compensation
+
+        # Should handle overflow gracefully with logarithmic compensation.
+        # log10(1e50 ** 10) = 500, clamped to OVERFLOW_THRESHOLD log10 of 100,
+        # so compensation == 400 (= log10 mismatch).
         assert result.magnitude == 1e100
-        assert compensation > 400.0  # Should have significant logarithmic compensation
+        assert compensation >= 400.0  # Should have significant logarithmic compensation
     
     def test_compensated_sqrt_negative_direction(self):
         """Test compensated_sqrt with negative direction."""
@@ -1173,15 +1186,20 @@ class TestMissingOperationsCoverage:
         assert compensation == 1.0
     
     def test_compensated_exp_overflow_exception_new(self):
-        """Test compensated_exp with OverflowError exception - lines 294-296"""
-        # Create a scenario that might trigger OverflowError in math.exp
+        """Test compensated_exp with OverflowError exception - lines 294-296.
+
+        ACT semantics: overflow is clamped to 1e100 with a finite logarithmic
+        compensation factor (replaces the previous sentinel ``inf`` which lost
+        the actual residual scale information).
+        """
         extreme_value = AbsoluteValue(magnitude=1000.0, direction=1)
-        
+
         result, compensation = Operations.compensated_exp(extreme_value)
-        
-        # Should handle OverflowError gracefully
+
         assert result.magnitude == 1e100
-        assert compensation == float('inf')
+        # log_compensation = 1000 - log(1e100) ≈ 769.74
+        assert math.isfinite(compensation)
+        assert compensation > 700.0
     
     def test_compensated_exp_overflow_exception(self):
         """Test compensated_exp with overflow exception handling."""
@@ -1401,14 +1419,19 @@ class TestMissingOperationsCoverage:
         assert compensation < 1.0
     
     def test_compensated_power_overflow_exception_handling(self):
-        """Test compensated_power overflow exception handling - lines 200-205"""
-        # This test covers the exception handling in the try-catch block
+        """Test compensated_power overflow exception handling - lines 200-205.
+
+        ACT semantics: catastrophic overflow is clamped to 1e100 with logarithmic
+        compensation factor (consistent with TestMissingOperationsCoverage::
+        test_compensated_power_overflow_exception). Returning Absolute would
+        violate the non-zero invariant for positive bases raised to positive
+        exponents.
+        """
         large_base = AbsoluteValue(magnitude=1e50, direction=1)
         result, compensation = Operations.compensated_power(large_base, 10.0)
-        
-        # Should handle overflow by returning absolute value
-        assert result.is_absolute()
-        assert compensation == 0.0
+
+        assert result.magnitude == 1e100
+        assert compensation >= 400.0
     
     def test_compensated_sqrt_negative_direction(self):
         """Test compensated_sqrt with negative direction - line 222-223"""

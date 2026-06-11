@@ -1,30 +1,95 @@
 # Copyright (c) 2024-2026 Tikhonov Andrey. All rights reserved.
 # SPDX-License-Identifier: MIT (non-commercial) | Commercial use: see COMMERCIAL_LICENSE.md
-from typing import List
-from balansis.core.absolute import AbsoluteValue
+"""ACT-compensated GEMM (general matrix multiply).
 
-def matmul(a: List[List[AbsoluteValue]], b: List[List[AbsoluteValue]]) -> List[List[AbsoluteValue]]:
+``matmul`` multiplies two matrices whose entries are :class:`AbsoluteValue`,
+accumulating each output entry with :meth:`Operations.compensated_multiply`
+and Neumaier (improved Kahan-Babuška) summation. The result is returned
+together with a scalar compensation factor that aggregates the worst-case
+per-cell compensation observed during the computation.
+"""
+from __future__ import annotations
+
+from typing import List, Tuple
+
+from balansis.core.absolute import AbsoluteValue
+from balansis.core.operations import Operations
+
+Matrix = List[List[AbsoluteValue]]
+
+
+def _validate_rectangular(name: str, mat: Matrix) -> int:
+    if not mat:
+        return 0
+    width = len(mat[0])
+    for row in mat:
+        if len(row) != width:
+            raise ValueError(f"Invalid shape for matrix {name}")
+    return width
+
+
+def matmul(
+    a: Matrix,
+    b: Matrix,
+    use_compensation: bool = True,
+) -> Tuple[Matrix, float]:
+    """Compute C = A · B with ACT-compensated arithmetic.
+
+    Args:
+        a: Left operand, list of rows of AbsoluteValue (shape m×k).
+        b: Right operand, list of rows of AbsoluteValue (shape k×n).
+        use_compensation: When True (default), accumulate each row inner
+            product with Neumaier compensation; otherwise use a plain
+            running sum.
+
+    Returns:
+        ``(C, total_compensation)`` where ``C`` is the m×n product matrix
+        (entries are :class:`AbsoluteValue`) and ``total_compensation`` is
+        the maximum per-cell compensation factor observed (≥ 1.0 for
+        non-empty inputs).
+
+    Raises:
+        ValueError: For inconsistent matrix shapes or mismatched inner
+            dimensions.
+    """
+    if not a and not b:
+        return [], 1.0
     if not a or not b:
-        return []
-    n = len(a)
-    m = len(a[0])
-    p = len(b[0])
-    for row in a:
-        if len(row) != m:
-            raise ValueError("Invalid shape for matrix a")
-    if len(b) != m:
+        raise ValueError("Both matrices must be non-empty for matrix multiplication")
+
+    m = len(a)
+    a_cols = _validate_rectangular("a", a)
+    if len(b) != a_cols:
         raise ValueError("Inner dimensions must match")
-    for row in b:
-        if len(row) != p:
-            raise ValueError("Invalid shape for matrix b")
-    result: List[List[AbsoluteValue]] = []
-    for i in range(n):
+    n = _validate_rectangular("b", b)
+
+    result: Matrix = []
+    overall_compensation = 1.0
+
+    for i in range(m):
         row_res: List[AbsoluteValue] = []
-        for j in range(p):
-            acc = AbsoluteValue.absolute()
-            for k in range(m):
-                prod = a[i][k] * b[k][j].to_float()
-                acc = acc + prod
-            row_res.append(acc)
+        for j in range(n):
+            total = 0.0
+            compensation_sum = 0.0
+            cell_compensation = 1.0
+            for k in range(a_cols):
+                prod, prod_comp = Operations.compensated_multiply(a[i][k], b[k][j])
+                if prod_comp > cell_compensation:
+                    cell_compensation = prod_comp
+                v = prod.to_float()
+                if use_compensation:
+                    t = total + v
+                    if abs(total) >= abs(v):
+                        compensation_sum += (total - t) + v
+                    else:
+                        compensation_sum += (v - t) + total
+                    total = t
+                else:
+                    total = total + v
+            corrected = total + compensation_sum if use_compensation else total
+            row_res.append(AbsoluteValue.from_float(corrected))
+            if cell_compensation > overall_compensation:
+                overall_compensation = cell_compensation
         result.append(row_res)
-    return result
+
+    return result, overall_compensation
