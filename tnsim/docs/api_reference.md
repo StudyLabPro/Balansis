@@ -1,5 +1,10 @@
 # TNSIM API Reference
 
+> Repository note:
+> `tnsim` is documented inside the Balansis monorepo and inherits repository
+> licensing/security policy. See `../LICENSING.md`, `../COMMERCIAL_LICENSE.md`,
+> and `../SECURITY.md`.
+
 ## Table of Contents
 
 1. [Core Classes](#core-classes)

@@ -328,6 +328,9 @@ Commercial licensing inquiries, quote requests, and enterprise contracting:
 - Email: `andrew@xteam.pro`
 - Website: [https://xteam.pro](https://xteam.pro)
 
+The repository includes [ORDER_FORM_TEMPLATE.md](ORDER_FORM_TEMPLATE.md) as a
+practical template for commercial transactions and scope definition.
+
 ## 27. Execution Requirement
 
 This repository copy of the Agreement describes the standard commercial terms.

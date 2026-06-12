@@ -29,9 +29,9 @@
 ### Installation from source
 
 ```bash
-git clone https://github.com/your-repo/tnsim.git
-cd tnsim
-pip install -r requirements.txt
+git clone https://github.com/XTeam-Pro/Balansis.git
+cd Balansis
+pip install -e .
 ```
 
 ### Installation with Docker
@@ -140,8 +140,8 @@ print(f"Attention weights: {attention_weights.shape}")
 ### Start server
 
 ```bash
-cd tnsim/api
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+cd /path/to/Balansis
+uvicorn tnsim.api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Main endpoints
@@ -389,10 +389,10 @@ dual-licensing model:
 
 ## 📞 Support
 
-- **Email**: support@tnsim.org
-- **Discord**: [TNSIM Community](https://discord.gg/tnsim)
-- **Issues**: [GitHub Issues](https://github.com/your-repo/tnsim/issues)
-- **Documentation**: [docs.tnsim.org](https://docs.tnsim.org)
+- **Commercial / repository contact**: `andrew@xteam.pro`
+- **Issues**: use the main Balansis repository issue tracker
+- **Licensing**: see `../LICENSING.md` and `../COMMERCIAL_LICENSE.md`
+- **Security**: report privately according to `../SECURITY.md`
 
 ---
 

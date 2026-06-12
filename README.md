@@ -274,6 +274,7 @@ model. Before opening a substantial pull request, read:
 - [CLA.md](CLA.md)
 - [LICENSING.md](LICENSING.md)
 - [NOTICE](NOTICE)
+- [SECURITY.md](SECURITY.md)
 
 This is especially important for externally sourced code, employer-owned work,
 and contributions that may later ship in both the open-source and commercial
@@ -317,6 +318,12 @@ GitHub license detection is driven by the canonical open-source text in the
 root `LICENSE` file. The repository therefore keeps the standard AGPL text in
 `LICENSE` and documents the commercial option separately in `LICENSING.md` and
 `COMMERCIAL_LICENSE.md`.
+
+Commercial deals can be structured using the repository baseline documents:
+
+- [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md)
+- [ORDER_FORM_TEMPLATE.md](ORDER_FORM_TEMPLATE.md)
+- [SECURITY.md](SECURITY.md) for responsible vulnerability disclosure
 
 Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
 

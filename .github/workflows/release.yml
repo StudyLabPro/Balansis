@@ -37,6 +37,8 @@ jobs:
         test -f COMMERCIAL_LICENSE.md
         test -f CLA.md
         test -f CONTRIBUTING.md
+        test -f SECURITY.md
+        test -f ORDER_FORM_TEMPLATE.md
         [ ! -f LICENSE-AGPLv3 ]
         [ ! -f LICENSE-COMMERCIAL ]
 
