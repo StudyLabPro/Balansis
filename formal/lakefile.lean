@@ -12,3 +12,6 @@ require mathlib from git
 
 @[default_target]
 lean_lib BalansisFormal
+
+@[default_target]
+lean_lib ACT

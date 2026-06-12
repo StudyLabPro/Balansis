@@ -18,7 +18,7 @@ deriving DecidableEq, Repr
 
 namespace Direction
 
-noncomputable def toReal : Direction → ℝ
+def toReal : Direction → ℝ
   | pos => 1
   | neg => -1
 

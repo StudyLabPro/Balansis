@@ -1,7 +1,7 @@
 [![Version](https://img.shields.io/badge/version-0.6.1-blue.svg)](https://github.com/XTeam-Pro/Balansis)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://python.org)
 [![Coverage](https://img.shields.io/badge/coverage-85%25%2B-brightgreen.svg)](https://github.com/XTeam-Pro/Balansis)
-[![Lean4](https://img.shields.io/badge/Lean4-12%20axioms%20proven-blueviolet.svg)](./formal/)
+[![Lean4](https://img.shields.io/badge/Lean4-A1--A5%2C%20E1--E4%2C%20S1--S3%20proved-blueviolet.svg)](./formal/)
 [![License](https://img.shields.io/badge/license-MIT%20%2F%20Commercial-blue.svg)](./COMMERCIAL_LICENSE.md)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -196,25 +196,43 @@ assets = ledger.account_balance("assets")  # AbsoluteValue — per-account balan
 
 ## Formal Verification
 
-Version 0.6.1 ships a complete Lean4 formalization of ACT using Mathlib v4.28.0. All 12 axioms are machine-checked — **0 `sorry`, 0 errors, 0 admitted axioms**.
+Version 0.6.1 ships a compiled Lean4 formalization of ACT on Mathlib v4.28.0.
 
-| Group | Lean4 file | Proven axioms |
-|-------|-----------|---------------|
-| AbsoluteGroup | `BalansisFormal/AbsoluteValue.lean` | A1: `add_absolute_right`, A2: `add_comm`, A3: `add_assoc`, A4: `add_inverse`, A5: `add_cancellation` |
-| EternityField | `BalansisFormal/EternalRatio.lean` | E1: `mul_identity`, E2: `mul_comm`, E3: `mul_assoc`, E4: `mul_inverse` |
-| Cross-structure | `BalansisFormal/Algebra.lean` | S1: `s1_distributivity`, S2: `s2_mul_inverse`, S3: `s3_commutativity_with_add` |
-| Direction | `BalansisFormal/Direction.lean` | 13 theorems: `neg_ne_pos`, `double_neg`, `mul_same`, `mul_diff`, and more |
+- `BalansisFormal` is the constructive core: `Direction`, `AbsoluteValue`, quotient-based `EternalRatio`, and structural algebra lemmas.
+- `ACT` is the public theorem layer: it re-exports the proved ACT statements as Lean theorems with the same public names.
+- `formal/` contains **0 `axiom`, 0 `sorry`, 0 `admit`**.
+- `lake build`, `lake build BalansisFormal`, and `lake build ACT` all succeed.
+- `EternalRatio` has a Lean `Field` instance. In Lean/Mathlib, `Field` is already commutative.
 
-The proofs include `toReal` bridge lemmas connecting ACT types to `ℝ`:
+### Proof Status
 
-- `AbsoluteValue.toReal`: `toReal (mk m d) = m.toReal * d.toReal`
-- `toReal_injective`: structural equality follows from real-number equality
-- `EternalRatio.mul_toReal`: multiplication bridge
+| Group | Public Lean module | Theorems | Status |
+|-------|--------------------|----------|--------|
+| A1–A5 | `ACT/Absolute.lean` | `a1_exists_unique`, `a2_nonneg`, `a3_compensation`, `a4_additive_identity`, `a4_additive_identity_left`, `a5_direction_preservation` | proved |
+| E1–E4 | `ACT/EternalRatio.lean` | `e1_well_defined`, `e2_stability`, `e3_multiplicative_identity`, `e3_multiplicative_identity_left`, `e4_inverse` | proved |
+| S1 | `ACT/Algebra.lean` | `ACT.AbsoluteValue.s1_closure`, `s1_associativity`, `s1_commutativity`, `s1_identity_right`, `s1_identity_left`, `s1_inverse` | proved |
+| S2 | `ACT/Algebra.lean` | `ACT.AbsoluteValue.s2_closure`, `s2_mul_associativity`, `s2_mul_commutativity`, `s2_mul_identity_right`, `s2_mul_identity_left`, `s2_mul_inverse`, `mul_add_distrib` | proved |
+| S3 | `ACT/Algebra.lean` | `ACT.EternalRatio.s3_add_assoc`, `s3_add_comm`, `s3_add_identity`, `s3_add_inverse`, `s3_mul_assoc`, `s3_mul_comm`, `s3_mul_identity`, `s3_mul_inverse`, `s3_distributivity` | proved |
+
+### Architecture
+
+- `formal/BalansisFormal/Direction.lean`: sign theory and bridge lemmas to `ℝ`.
+- `formal/BalansisFormal/AbsoluteValue.lean`: constructive signed-magnitude model, A1–A5 core proofs, and `Field AbsoluteValue`.
+- `formal/BalansisFormal/EternalRatio.lean`: quotient of ratio representatives by cross-multiplication equivalence, E1–E4, and `Field EternalRatio`.
+- `formal/BalansisFormal/Algebra.lean`: structural S1–S3 laws on the actual Lean types.
+- `formal/ACT.lean` and `formal/ACT/*.lean`: public theorem facade over the compiled core.
+- `formal/FormalAudit.lean`: smoke module importing the public surface and checking key theorem and instance availability.
 
 To verify locally:
 
 ```bash
-cd formal && lake build
+cd formal
+lake build
+lake build BalansisFormal
+lake build ACT
+lake env lean ACT/Absolute.lean
+lake env lean ACT/Algebra.lean
+lake env lean FormalAudit.lean
 ```
 
 ---

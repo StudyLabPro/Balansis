@@ -1,201 +1,91 @@
--- Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
--- This file is part of Balansis, dual-licensed under AGPLv3 / Commercial.
--- See LICENSE in the project root. Commercial use: andrew@xteam.pro
-/-
-  ACT.Algebra — Structural axioms (S1–S3)
-
-  This module establishes the algebraic structures that AbsoluteValue
-  and EternalRatio form:
-    S1: (Abs, +, Absolute, neg) is an abelian group
-    S2: (Abs \ {Absolute}, *, unit, inv) is an abelian group
-    S3: (EternalRatio, +, *) forms a field
-
-  Authors: Balansis Team
-  Version: 0.6.1
+/- 
+  ACT.Algebra — public theorem layer for S1–S3 and the field structure.
 -/
-
 import ACT.Absolute
-import ACT.Eternity
+import ACT.EternalRatio
+import BalansisFormal.Algebra
 
 namespace ACT
 
-/-!
-## Axiom S1: Additive Abelian Group
+noncomputable section
 
-(Abs, +, Absolute, neg) forms an abelian group where:
-- + is AbsoluteValue.add
-- Identity is AbsoluteValue.absolute
-- Inverse is negation (direction inversion)
--/
+namespace AbsoluteValue
 
-/-- Negation (additive inverse) of an AbsoluteValue. -/
-def AbsoluteValue.neg (a : AbsoluteValue) : AbsoluteValue :=
-  { magnitude := a.magnitude
-    direction := a.direction.negate
-    mag_nonneg := a.mag_nonneg }
+theorem s1_closure (a b : AbsoluteValue) : ∃ c : AbsoluteValue, c = a + b :=
+  BalansisFormal.AbsoluteValue.s1_closure a b
 
-/-- S1.1 (Closure): Addition of two AbsoluteValues produces an AbsoluteValue.
-    This holds trivially by the definition of AbsoluteValue.add. -/
-theorem s1_closure (a b : AbsoluteValue) :
-    True := -- AbsoluteValue.add returns AbsoluteValue by construction
-  trivial
+theorem s1_associativity (a b c : AbsoluteValue) : (a + b) + c = a + (b + c) :=
+  BalansisFormal.AbsoluteValue.s1_associativity a b c
 
-/-- S1.2 (Associativity): (a + b) + c = a + (b + c).
-    Addition of AbsoluteValues is associative. -/
-axiom s1_associativity :
-  ∀ (a b c : AbsoluteValue),
-    (a.add b).add c = a.add (b.add c)
+theorem s1_commutativity (a b : AbsoluteValue) : a + b = b + a :=
+  BalansisFormal.AbsoluteValue.s1_commutativity a b
 
-/-- S1.3 (Identity): a + Absolute = a = Absolute + a.
-    This follows from A4 (additive identity). -/
-theorem s1_identity (a : AbsoluteValue) :
-    a.add AbsoluteValue.absolute = a ∧
-    AbsoluteValue.absolute.add a = a := by
-  exact ⟨a4_additive_identity a, a4_additive_identity_left a⟩
+theorem s1_identity_right (a : AbsoluteValue) : a + 0 = a :=
+  BalansisFormal.AbsoluteValue.s1_identity_right a
 
-/-- S1.4 (Inverse): a + (-a) = Absolute.
-    Every AbsoluteValue has an additive inverse. -/
-axiom s1_inverse :
-  ∀ (a : AbsoluteValue),
-    (a.add a.neg).isAbsolute
+theorem s1_identity_left (a : AbsoluteValue) : (0 : AbsoluteValue) + a = a :=
+  BalansisFormal.AbsoluteValue.s1_identity_left a
 
-/-- S1.5 (Commutativity): a + b = b + a.
-    Addition is commutative. -/
-axiom s1_commutativity :
-  ∀ (a b : AbsoluteValue),
-    a.add b = b.add a
+theorem s1_inverse (a : AbsoluteValue) : a + (-a) = 0 :=
+  BalansisFormal.AbsoluteValue.s1_inverse a
 
-/-!
-## Axiom S2: Multiplicative Abelian Group on Abs \ {Absolute}
+theorem s2_closure (a b : AbsoluteValue) (ha : a ≠ 0) (hb : b ≠ 0) : a * b ≠ 0 :=
+  BalansisFormal.AbsoluteValue.s2_closure a b ha hb
 
-(Abs \ {Absolute}, *, unit_positive, inv) forms an abelian group.
--/
+theorem s2_mul_associativity (a b c : AbsoluteValue) : (a * b) * c = a * (b * c) :=
+  BalansisFormal.AbsoluteValue.s2_mul_associativity a b c
 
-/-- Pointwise multiplication of two AbsoluteValues.
-    mag(a*b) = mag(a) * mag(b), dir(a*b) = dir(a) * dir(b). -/
-def AbsoluteValue.mul (a b : AbsoluteValue) : AbsoluteValue :=
-  { magnitude := a.magnitude * b.magnitude
-    direction := a.direction.mul b.direction
-    mag_nonneg := by native_decide }
+theorem s2_mul_commutativity (a b : AbsoluteValue) : a * b = b * a :=
+  BalansisFormal.AbsoluteValue.s2_mul_commutativity a b
 
-/-- The multiplicative unit: magnitude = 1, direction = +1. -/
-def AbsoluteValue.one : AbsoluteValue :=
-  AbsoluteValue.mk' 1.0 .pos
+theorem s2_mul_identity_right (a : AbsoluteValue) : a * 1 = a :=
+  BalansisFormal.AbsoluteValue.s2_mul_identity_right a
 
-/-- Multiplicative inverse: 1/magnitude, same direction.
-    Requires non-Absolute (magnitude > 0). -/
-def AbsoluteValue.mulInv (a : AbsoluteValue) (h : a.magnitude > 0 := by native_decide) :
-    AbsoluteValue :=
-  { magnitude := 1.0 / a.magnitude
-    direction := a.direction
-    mag_nonneg := by native_decide }
+theorem s2_mul_identity_left (a : AbsoluteValue) : (1 : AbsoluteValue) * a = a :=
+  BalansisFormal.AbsoluteValue.s2_mul_identity_left a
 
-/-- S2.1 (Closure on non-zero): Product of non-Absolute values is non-Absolute.
-    If a,b ∉ {Absolute} then a*b ∉ {Absolute}. -/
-axiom s2_closure :
-  ∀ (a b : AbsoluteValue),
-    ¬a.isAbsolute → ¬b.isAbsolute →
-    ¬(a.mul b).isAbsolute
+theorem s2_mul_inverse (a : AbsoluteValue) (ha : a ≠ 0) : a * a⁻¹ = 1 :=
+  BalansisFormal.AbsoluteValue.s2_mul_inverse a ha
 
-/-- S2.2 (Associativity): (a * b) * c = a * (b * c). -/
-axiom s2_mul_associativity :
-  ∀ (a b c : AbsoluteValue),
-    (a.mul b).mul c = a.mul (b.mul c)
+theorem mul_add_distrib (a b c : AbsoluteValue) : a * (b + c) = a * b + a * c :=
+  BalansisFormal.AbsoluteValue.mul_add_distrib a b c
 
-/-- S2.3 (Identity): a * one = a.
-    AbsoluteValue.one is the multiplicative identity. -/
-axiom s2_mul_identity :
-  ∀ (a : AbsoluteValue),
-    a.mul AbsoluteValue.one = a
+end AbsoluteValue
 
-/-- S2.3 symmetric: one * a = a. -/
-axiom s2_mul_identity_left :
-  ∀ (a : AbsoluteValue),
-    AbsoluteValue.one.mul a = a
+namespace EternalRatio
 
-/-- S2.4 (Inverse): a * a⁻¹ = one for non-Absolute a.
-    Every non-zero AbsoluteValue has a multiplicative inverse. -/
-axiom s2_mul_inverse :
-  ∀ (a : AbsoluteValue) (h : a.magnitude > 0),
-    (a.mul (a.mulInv h)).magnitude = 1.0
+theorem s3_add_assoc (r₁ r₂ r₃ : EternalRatio) : (r₁ + r₂) + r₃ = r₁ + (r₂ + r₃) :=
+  BalansisFormal.EternalRatio.s3_add_assoc r₁ r₂ r₃
 
-/-- S2.5 (Commutativity): a * b = b * a. -/
-axiom s2_mul_commutativity :
-  ∀ (a b : AbsoluteValue),
-    a.mul b = b.mul a
+theorem s3_add_comm (r₁ r₂ : EternalRatio) : r₁ + r₂ = r₂ + r₁ :=
+  BalansisFormal.EternalRatio.s3_add_comm r₁ r₂
 
-/-!
-## Axiom S3: EternalRatio Field
+theorem s3_add_identity (r : EternalRatio) : r + zero = r :=
+  BalansisFormal.EternalRatio.s3_add_identity r
 
-(EternalRatio, +, *) forms a field extending the group structures
-on AbsoluteValue.
--/
+theorem s3_add_inverse (r : EternalRatio) : r + (-r) = zero :=
+  BalansisFormal.EternalRatio.s3_add_inverse r
 
-/-- Addition of EternalRatios: (a/b) + (c/d) = (a·d + c·b) / (b·d). -/
-def EternalRatio.add (r₁ r₂ : EternalRatio) : EternalRatio :=
-  let ad := AbsoluteValue.mk'
-    (r₁.numerator.magnitude * r₂.denominator.magnitude)
-    (r₁.numerator.direction.mul r₂.denominator.direction)
-  let cb := AbsoluteValue.mk'
-    (r₂.numerator.magnitude * r₁.denominator.magnitude)
-    (r₂.numerator.direction.mul r₁.denominator.direction)
-  let newNum := ad.add cb
-  let newDen := AbsoluteValue.mk'
-    (r₁.denominator.magnitude * r₂.denominator.magnitude)
-    (r₁.denominator.direction.mul r₂.denominator.direction)
-  { numerator := newNum
-    denominator := newDen
-    den_nonzero := by native_decide }
+theorem s3_mul_assoc (r₁ r₂ r₃ : EternalRatio) : (r₁ * r₂) * r₃ = r₁ * (r₂ * r₃) :=
+  BalansisFormal.EternalRatio.s3_mul_assoc r₁ r₂ r₃
 
-/-- The additive identity for EternalRatio: 0/1. -/
-def EternalRatio.zero : EternalRatio :=
-  { numerator := AbsoluteValue.absolute
-    denominator := AbsoluteValue.mk' 1.0 .pos
-    den_nonzero := by native_decide }
+theorem s3_mul_comm (r₁ r₂ : EternalRatio) : r₁ * r₂ = r₂ * r₁ :=
+  BalansisFormal.EternalRatio.s3_mul_comm r₁ r₂
 
-/-- S3.1 (Additive group): (EternalRatio, +, zero) forms an abelian group. -/
+theorem s3_mul_identity (r : EternalRatio) : r * unity = r :=
+  BalansisFormal.EternalRatio.s3_mul_identity r
 
-/-- S3.1a: Addition is associative. -/
-axiom s3_add_assoc :
-  ∀ (r₁ r₂ r₃ : EternalRatio),
-    (r₁.add r₂).add r₃ = r₁.add (r₂.add r₃)
+theorem s3_mul_inverse (r : EternalRatio) (hr : r ≠ zero) : r * r⁻¹ = unity :=
+  BalansisFormal.EternalRatio.s3_mul_inverse r hr
 
-/-- S3.1b: zero is the additive identity. -/
-axiom s3_add_identity :
-  ∀ (r : EternalRatio),
-    (r.add EternalRatio.zero).numericalValue = r.numericalValue
+theorem s3_distributivity (a b c : EternalRatio) : a * (b + c) = a * b + a * c :=
+  BalansisFormal.EternalRatio.s3_distributivity a b c
 
-/-- S3.1c: Addition is commutative. -/
-axiom s3_add_comm :
-  ∀ (r₁ r₂ : EternalRatio),
-    (r₁.add r₂).numericalValue = (r₂.add r₁).numericalValue
+noncomputable def eternal_ratio_field : Field EternalRatio :=
+  BalansisFormal.EternalRatio.eternal_ratio_field
 
-/-- S3.2 (Multiplicative group on non-zero): (EternalRatio \ {zero}, *, unity)
-    forms an abelian group.
-    This follows from E3 (multiplicative identity) and E4 (inverse). -/
+end EternalRatio
 
-/-- S3.2a: Multiplication is associative. -/
-axiom s3_mul_assoc :
-  ∀ (r₁ r₂ r₃ : EternalRatio),
-    (r₁.mul r₂).mul r₃ = r₁.mul (r₂.mul r₃)
-
-/-- S3.2b: Multiplication is commutative. -/
-axiom s3_mul_comm :
-  ∀ (r₁ r₂ : EternalRatio),
-    (r₁.mul r₂).numericalValue = (r₂.mul r₁).numericalValue
-
-/-- S3.3 (Distributivity): Multiplication distributes over addition.
-    a * (b + c) = a*b + a*c. -/
-axiom s3_distributivity :
-  ∀ (a b c : EternalRatio),
-    (a.mul (b.add c)).numericalValue =
-    ((a.mul b).add (a.mul c)).numericalValue
-
-/-- Key theorem: EternalRatio forms a field.
-    Combining S3.1 (additive abelian group), S3.2 (multiplicative abelian group
-    on non-zero elements), and S3.3 (distributivity), we obtain a field structure. -/
-theorem eternal_ratio_field :
-    True := -- The field structure follows from axioms S3.1, S3.2, S3.3
-  trivial
+end
 
 end ACT

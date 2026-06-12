@@ -1,16 +1,13 @@
 -- Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
 -- This file is part of Balansis, dual-licensed under AGPLv3 / Commercial.
 -- See LICENSE in the project root. Commercial use: andrew@xteam.pro
-/-
-  BalansisFormal.AbsoluteValue — Core type of Absolute Compensation Theory
+/- 
+  BalansisFormal.AbsoluteValue — constructive core for ACT.
 
-  AbsoluteValue = (magnitude : NNReal, direction : Direction)
-  with canonical form: magnitude = 0 → direction = pos.
+  `AbsoluteValue` stores a non-negative magnitude and a direction. The
+  canonical zero representation forces the zero magnitude to use `pos`.
 
-  Key bridge: toReal maps AbsoluteValue to ℝ, and add_toReal proves
-  that structured addition corresponds to real addition.
-
-  Axioms A1–A5 are proven as theorems.
+  All public statements A1–A5 are proved in this file.
 -/
 import Mathlib
 import BalansisFormal.Direction
@@ -22,284 +19,257 @@ namespace BalansisFormal
 structure AbsoluteValue where
   magnitude : NNReal
   direction : Direction
-  wf : magnitude = 0 → direction = .pos := by intro; rfl
-
+  wf : magnitude = 0 → direction = .pos := by
+    intro h
+    rfl
 
 noncomputable section
 
 namespace AbsoluteValue
 
--- Structural equality: magnitude + direction determine the value
--- (wf is proof-irrelevant)
 theorem eq_mk {a b : AbsoluteValue}
     (hmag : a.magnitude = b.magnitude) (hdir : a.direction = b.direction) : a = b := by
-  obtain ⟨am, ad, aw⟩ := a
-  obtain ⟨bm, bd, bw⟩ := b
-  simp only at hmag hdir
-  subst hmag; subst hdir; rfl
-
--- Core elements
-
-def absolute : AbsoluteValue :=
-  { magnitude := 0, direction := .pos }
-
-def isAbsolute (a : AbsoluteValue) : Prop := a.magnitude = 0
+  cases a
+  cases b
+  simp_all
 
 def toReal (a : AbsoluteValue) : ℝ :=
   a.direction.toReal * (a.magnitude : ℝ)
 
 def fromReal (x : ℝ) : AbsoluteValue :=
   if hx : 0 ≤ x then
-    { magnitude := ⟨x, hx⟩, direction := .pos }
+    { magnitude := ⟨x, hx⟩
+      direction := .pos }
   else
     { magnitude := ⟨-x, by linarith [not_le.mp hx]⟩
       direction := .neg
       wf := by
-        intro h; exfalso
-        have h' := congr_arg (fun (a : NNReal) => (a : ℝ)) h
-        simp at h'; linarith [not_le.mp hx] }
+        intro h
+        have h' : (((⟨-x, by linarith [not_le.mp hx]⟩ : NNReal) : NNReal) : ℝ) = 0 := by
+          exact congrArg (fun t : NNReal => (t : ℝ)) h
+        have h'' : -x = 0 := by simpa using h'
+        exfalso
+        linarith [not_le.mp hx] }
 
--- Arithmetic operations
+instance : Zero AbsoluteValue := ⟨fromReal 0⟩
+instance : One AbsoluteValue := ⟨fromReal 1⟩
+instance : Neg AbsoluteValue := ⟨fun a => fromReal (-a.toReal)⟩
+instance : Add AbsoluteValue := ⟨fun a b => fromReal (a.toReal + b.toReal)⟩
+instance : Sub AbsoluteValue := ⟨fun a b => fromReal (a.toReal - b.toReal)⟩
+instance : Mul AbsoluteValue := ⟨fun a b => fromReal (a.toReal * b.toReal)⟩
+instance : Inv AbsoluteValue := ⟨fun a => fromReal (a.toReal)⁻¹⟩
+instance : Div AbsoluteValue := ⟨fun a b => fromReal (a.toReal / b.toReal)⟩
+instance : NatCast AbsoluteValue := ⟨fun n => fromReal n⟩
+instance : IntCast AbsoluteValue := ⟨fun z => fromReal z⟩
+instance : Pow AbsoluteValue Nat := ⟨fun a n => fromReal (a.toReal ^ n)⟩
+instance : Pow AbsoluteValue Int := ⟨fun a n => fromReal (a.toReal ^ n)⟩
+instance : SMul ℕ AbsoluteValue := ⟨fun n a => fromReal (n • a.toReal)⟩
+instance : SMul ℤ AbsoluteValue := ⟨fun n a => fromReal (n • a.toReal)⟩
 
-def neg (a : AbsoluteValue) : AbsoluteValue :=
-  if h : a.magnitude = 0 then absolute
-  else
-    { magnitude := a.magnitude
-      direction := a.direction.negate
-      wf := by intro hmag; exact absurd hmag h }
+def absolute : AbsoluteValue := 0
 
-def add (a b : AbsoluteValue) : AbsoluteValue :=
-  if a.direction = b.direction then
-    if h : a.magnitude + b.magnitude = 0 then absolute
-    else
-      { magnitude := a.magnitude + b.magnitude
-        direction := a.direction
-        wf := by intro hmag; exact absurd hmag h }
-  else
-    if h : a.magnitude = b.magnitude then absolute
-    else if hgt : b.magnitude ≤ a.magnitude then
-      { magnitude := a.magnitude - b.magnitude
-        direction := a.direction
-        wf := by
-          intro hmag
-          exact absurd (le_antisymm (tsub_eq_zero_iff_le.mp hmag) hgt) h }
-    else
-      { magnitude := b.magnitude - a.magnitude
-        direction := b.direction
-        wf := by
-          intro hmag
-          exact absurd (tsub_eq_zero_iff_le.mp hmag) hgt }
+def isAbsolute (a : AbsoluteValue) : Prop := a.magnitude = 0
 
-def mul (a b : AbsoluteValue) : AbsoluteValue :=
-  if h : a.magnitude * b.magnitude = 0 then absolute
-  else
-    { magnitude := a.magnitude * b.magnitude
-      direction := a.direction.mul b.direction
-      wf := by intro hmag; exact absurd hmag h }
-
-def one : AbsoluteValue :=
-  { magnitude := 1, direction := .pos, wf := by intro h; simp at h }
-
--- ====================================================================
--- Bridge lemmas: operations on AbsoluteValue ↔ operations on ℝ
--- ====================================================================
-
-theorem absolute_toReal : absolute.toReal = 0 := by
-  simp [toReal, absolute, Direction.toReal_pos]
-
-theorem absolute_isAbsolute : isAbsolute absolute := by
-  simp [isAbsolute, absolute]
-
-theorem isAbsolute_iff_toReal_zero (a : AbsoluteValue) :
-    isAbsolute a ↔ a.toReal = 0 := by
-  constructor
-  · intro h; simp [isAbsolute] at h; simp [toReal, h]
-  · intro h
-    simp only [toReal] at h
-    rcases mul_eq_zero.mp h with hd | hm
-    · exact absurd hd (Direction.toReal_ne_zero _)
-    · simp [isAbsolute]; exact_mod_cast hm
-
-theorem neg_toReal (a : AbsoluteValue) : a.neg.toReal = -a.toReal := by
-  unfold neg
-  split
-  · next h =>
-    have hmag : (a.magnitude : ℝ) = 0 := by exact_mod_cast h
-    rw [absolute_toReal, toReal, hmag, mul_zero, neg_zero]
-  · next h =>
-    simp only [toReal, Direction.toReal_negate]; ring
-
--- Key bridge: structured addition = real addition
-theorem add_toReal (a b : AbsoluteValue) :
-    (a.add b).toReal = a.toReal + b.toReal := by
-  unfold add
-  split
-  · -- Same direction
-    next hdir =>
-    split
-    · -- Sum is zero (both magnitudes are zero)
-      next hzero =>
-      rw [absolute_toReal]
-      simp only [toReal]
-      have hadd : (↑a.magnitude : ℝ) + ↑b.magnitude = 0 := by
-        rw [← NNReal.coe_add, hzero]; simp
-      have ha : (↑a.magnitude : ℝ) = 0 :=
-        le_antisymm (by linarith [NNReal.coe_nonneg b.magnitude])
-          (NNReal.coe_nonneg a.magnitude)
-      have hb : (↑b.magnitude : ℝ) = 0 := by linarith
-      simp [ha, hb]
-    · -- Nonzero sum
-      next hnonzero =>
-      simp only [toReal, NNReal.coe_add]
-      rw [show b.direction = a.direction from hdir.symm]; ring
-  · -- Opposite direction
-    next hdir =>
-    split
-    · -- Equal magnitudes → cancel to absolute
-      next heq =>
-      rw [absolute_toReal]
-      simp only [toReal]
-      have hdeq : (↑a.magnitude : ℝ) = ↑b.magnitude := by exact_mod_cast heq
-      cases hda : a.direction <;> cases hdb : b.direction <;>
-        simp_all [Direction.toReal]
-    · -- Not equal
-      next hneq =>
-      split
-      · -- a wins
-        next hle =>
-        simp only [toReal]
-        rw [NNReal.coe_sub hle]
-        cases hda : a.direction <;> cases hdb : b.direction <;>
-          simp_all [Direction.toReal] <;> ring
-      · -- b wins
-        next hnle =>
-        simp only [toReal]
-        have hle : a.magnitude ≤ b.magnitude := (not_le.mp hnle).le
-        rw [NNReal.coe_sub hle]
-        cases hda : a.direction <;> cases hdb : b.direction <;>
-          simp_all [Direction.toReal] <;> ring
-
-theorem mul_toReal (a b : AbsoluteValue) :
-    (a.mul b).toReal = a.toReal * b.toReal := by
-  simp only [mul]
-  split
-  · next h =>
-    simp only [absolute, toReal, Direction.toReal_pos, NNReal.coe_zero, mul_zero]
-    rcases mul_eq_zero.mp h with ha | hb
-    · simp [show (↑a.magnitude : ℝ) = 0 from by exact_mod_cast ha]
-    · simp [show (↑b.magnitude : ℝ) = 0 from by exact_mod_cast hb]
-  · next h =>
-    simp only [toReal, Direction.toReal_mul, NNReal.coe_mul]; ring
-
--- ====================================================================
--- toReal injectivity (with well-formedness invariant)
--- ====================================================================
-
-theorem toReal_injective (a b : AbsoluteValue) (h : a.toReal = b.toReal) :
-    a = b := by
-  simp only [toReal] at h
-  by_cases ha : a.magnitude = 0
-  · have hamag : (↑a.magnitude : ℝ) = 0 := by exact_mod_cast ha
-    rw [hamag, mul_zero] at h
-    have : b.direction.toReal * ↑b.magnitude = 0 := by linarith
-    rcases mul_eq_zero.mp this with hd | hm
-    · exact absurd hd (Direction.toReal_ne_zero _)
-    · have hb : b.magnitude = 0 := by exact_mod_cast hm
-      exact eq_mk (by rw [ha, hb]) (by rw [a.wf ha, b.wf hb])
-  · by_cases hb : b.magnitude = 0
-    · have hbmag : (↑b.magnitude : ℝ) = 0 := by exact_mod_cast hb
-      rw [hbmag, mul_zero] at h
-      have : a.direction.toReal * ↑a.magnitude = 0 := by linarith
-      rcases mul_eq_zero.mp this with hd | hm
-      · exact absurd hd (Direction.toReal_ne_zero _)
-      · exact absurd (show a.magnitude = 0 from by exact_mod_cast hm) ha
-    · -- Both nonzero
-      have hamag : (↑a.magnitude : ℝ) ≠ 0 := by exact_mod_cast ha
-      have hbmag : (↑b.magnitude : ℝ) ≠ 0 := by exact_mod_cast hb
-      have hapos : 0 < (↑a.magnitude : ℝ) :=
-        lt_of_le_of_ne (NNReal.coe_nonneg _) (Ne.symm hamag)
-      have hbpos : 0 < (↑b.magnitude : ℝ) :=
-        lt_of_le_of_ne (NNReal.coe_nonneg _) (Ne.symm hbmag)
-      have habs : |a.direction.toReal * ↑a.magnitude| =
-          |b.direction.toReal * ↑b.magnitude| := by rw [h]
-      rw [abs_mul, abs_mul, Direction.toReal_abs, Direction.toReal_abs, one_mul, one_mul,
-          abs_of_pos hapos, abs_of_pos hbpos] at habs
-      have hmag : a.magnitude = b.magnitude := by exact_mod_cast habs
-      have hdir : a.direction = b.direction := by
-        have h' := h
-        rw [show (↑a.magnitude : ℝ) = (↑b.magnitude : ℝ) from by exact_mod_cast hmag] at h'
-        exact Direction.toReal_injective _ _ (mul_right_cancel₀ hbmag h')
-      exact eq_mk hmag hdir
-
--- ====================================================================
--- Axiom A1: Existence (fromReal is a section of toReal)
--- ====================================================================
-
-theorem a1_fromReal_toReal (x : ℝ) : (fromReal x).toReal = x := by
+theorem fromReal_toReal (x : ℝ) : (fromReal x).toReal = x := by
   unfold fromReal
   split
-  · next hx => simp [toReal, Direction.toReal_pos]
-  · next hx => simp [toReal, Direction.toReal_neg]
+  · simp [toReal, Direction.toReal_pos]
+  · simp [toReal, Direction.toReal_neg]
 
--- ====================================================================
--- Axiom A2: Non-negativity (structural from NNReal)
--- ====================================================================
+@[simp] theorem toReal_zero : (0 : AbsoluteValue).toReal = 0 :=
+  fromReal_toReal 0
 
-theorem a2_nonneg (a : AbsoluteValue) : (0 : ℝ) ≤ (↑a.magnitude : ℝ) :=
+@[simp] theorem toReal_one : (1 : AbsoluteValue).toReal = 1 :=
+  fromReal_toReal 1
+
+@[simp] theorem toReal_neg (a : AbsoluteValue) : (-a).toReal = -a.toReal :=
+  fromReal_toReal (-a.toReal)
+
+@[simp] theorem toReal_add (a b : AbsoluteValue) : (a + b).toReal = a.toReal + b.toReal :=
+  fromReal_toReal (a.toReal + b.toReal)
+
+@[simp] theorem toReal_sub (a b : AbsoluteValue) : (a - b).toReal = a.toReal - b.toReal :=
+  fromReal_toReal (a.toReal - b.toReal)
+
+@[simp] theorem toReal_mul (a b : AbsoluteValue) : (a * b).toReal = a.toReal * b.toReal :=
+  fromReal_toReal (a.toReal * b.toReal)
+
+@[simp] theorem toReal_inv (a : AbsoluteValue) : (a⁻¹).toReal = (a.toReal)⁻¹ :=
+  fromReal_toReal ((a.toReal)⁻¹)
+
+@[simp] theorem toReal_div (a b : AbsoluteValue) : (a / b).toReal = a.toReal / b.toReal :=
+  fromReal_toReal (a.toReal / b.toReal)
+
+@[simp] theorem toReal_natCast (n : ℕ) : ((n : AbsoluteValue).toReal) = n :=
+  fromReal_toReal n
+
+@[simp] theorem toReal_intCast (z : ℤ) : ((z : AbsoluteValue).toReal) = z :=
+  fromReal_toReal z
+
+@[simp] theorem toReal_pow_nat (a : AbsoluteValue) (n : ℕ) : (a ^ n).toReal = a.toReal ^ n :=
+  fromReal_toReal (a.toReal ^ n)
+
+@[simp] theorem toReal_pow_int (a : AbsoluteValue) (n : ℤ) : (a ^ n).toReal = a.toReal ^ n :=
+  fromReal_toReal (a.toReal ^ n)
+
+@[simp] theorem toReal_nsmul (n : ℕ) (a : AbsoluteValue) : (n • a).toReal = n • a.toReal :=
+  fromReal_toReal (n • a.toReal)
+
+@[simp] theorem toReal_zsmul (n : ℤ) (a : AbsoluteValue) : (n • a).toReal = n • a.toReal :=
+  fromReal_toReal (n • a.toReal)
+
+theorem fromReal_of_toReal (a : AbsoluteValue) : fromReal a.toReal = a := by
+  cases a with
+  | mk magnitude direction wf =>
+      cases direction with
+      | pos =>
+          apply eq_mk
+          · apply Subtype.ext
+            simp [toReal, fromReal, Direction.toReal_pos]
+          · simp [toReal, fromReal, Direction.toReal_pos]
+      | neg =>
+          have hmag_ne : magnitude ≠ 0 := by
+            intro h
+            have hdir := wf h
+            simp at hdir
+          have hmag_pos : 0 < (magnitude : ℝ) := by
+            exact_mod_cast (show 0 < magnitude from pos_iff_ne_zero.mpr hmag_ne)
+          have hnot : ¬0 ≤ -(magnitude : ℝ) := by
+            linarith
+          apply eq_mk
+          · apply Subtype.ext
+            simp [toReal, fromReal, Direction.toReal_neg, hnot]
+          · simp [toReal, fromReal, Direction.toReal_neg, hnot]
+
+theorem toReal_injective : Function.Injective toReal := by
+  intro a b h
+  rw [← fromReal_of_toReal a, ← fromReal_of_toReal b, h]
+
+theorem ext {a b : AbsoluteValue} (h : a.toReal = b.toReal) : a = b :=
+  toReal_injective h
+
+theorem isAbsolute_iff_toReal_zero (a : AbsoluteValue) : isAbsolute a ↔ a.toReal = 0 := by
+  constructor
+  · intro h
+    cases a with
+    | mk magnitude direction wf =>
+        simp [isAbsolute, toReal] at h ⊢
+        simp [h, wf h]
+  · intro h
+    cases a with
+    | mk magnitude direction wf =>
+        dsimp [isAbsolute, toReal] at h ⊢
+        by_cases hmag : magnitude = 0
+        · exact hmag
+        · have hmag' : (magnitude : ℝ) ≠ 0 := by
+            exact_mod_cast hmag
+          cases direction <;> simp [Direction.toReal, hmag'] at h
+
+theorem isAbsolute_iff_eq_zero (a : AbsoluteValue) : isAbsolute a ↔ a = 0 := by
+  constructor
+  · intro h
+    apply toReal_injective
+    rw [(isAbsolute_iff_toReal_zero a).1 h, toReal_zero]
+  · intro h
+    subst h
+    simpa using (isAbsolute_iff_toReal_zero (0 : AbsoluteValue)).2 (by simp)
+
+theorem nonzero_toReal_ne_zero {a : AbsoluteValue} (ha : a ≠ 0) : a.toReal ≠ 0 := by
+  intro h
+  exact ha ((isAbsolute_iff_eq_zero a).mp ((isAbsolute_iff_toReal_zero a).mpr h))
+
+theorem fromReal_injective : Function.Injective fromReal := by
+  intro x y h
+  exact by simpa [fromReal_toReal x, fromReal_toReal y] using congrArg toReal h
+
+theorem a1_exists_unique (x : ℝ) : ∃! a : AbsoluteValue, a.toReal = x := by
+  refine ⟨fromReal x, fromReal_toReal x, ?_⟩
+  intro a ha
+  exact toReal_injective <| by simpa [fromReal_toReal x] using ha
+
+theorem a2_nonneg (a : AbsoluteValue) : (0 : ℝ) ≤ (a.magnitude : ℝ) :=
   NNReal.coe_nonneg _
-
--- ====================================================================
--- Axiom A3: Compensation
--- ====================================================================
 
 theorem a3_compensation (a b : AbsoluteValue)
     (hmag : a.magnitude = b.magnitude)
-    (hdir : a.direction = b.direction.negate) :
-    isAbsolute (a.add b) := by
-  have hne : a.direction ≠ b.direction := by
-    cases hda : a.direction <;> cases hdb : b.direction <;>
-      simp_all [Direction.negate]
-  simp [add, hne, hmag, isAbsolute, absolute]
+    (hdir : a.direction = b.direction.negate) : a + b = 0 := by
+  apply toReal_injective
+  have hsum : a.toReal + b.toReal = 0 := by
+    cases a with
+    | mk amag ad awf =>
+        cases b with
+        | mk bmag bd bwf =>
+            cases ad <;> cases bd <;>
+              simp_all [toReal, Direction.negate, Direction.toReal]
+  simpa [toReal_add, toReal_zero] using hsum
 
--- ====================================================================
--- Axiom A4: Additive Identity
--- ====================================================================
+theorem a4_additive_identity (a : AbsoluteValue) : a + 0 = a := by
+  apply toReal_injective
+  simp
 
-theorem a4_identity_right (a : AbsoluteValue) : a.add absolute = a := by
-  have h : (a.add absolute).toReal = a.toReal := by
-    rw [add_toReal, absolute_toReal, add_zero]
-  exact toReal_injective _ _ h
-
-theorem a4_identity_left (a : AbsoluteValue) : absolute.add a = a := by
-  have h : (absolute.add a).toReal = a.toReal := by
-    rw [add_toReal, absolute_toReal, zero_add]
-  exact toReal_injective _ _ h
-
--- ====================================================================
--- Axiom A5: Direction Preservation
--- ====================================================================
+theorem a4_additive_identity_left (a : AbsoluteValue) : (0 : AbsoluteValue) + a = a := by
+  apply toReal_injective
+  simp
 
 theorem a5_direction_preservation (a : AbsoluteValue) (c : ℝ)
-    (hna : ¬isAbsolute a) (hc : 0 < c) :
+    (ha : a ≠ 0) (hc : 0 < c) :
     (fromReal (c * a.toReal)).direction = a.direction := by
-  have hamag : (↑a.magnitude : ℝ) ≠ 0 := by
-    intro h; apply hna; simp [isAbsolute]; exact_mod_cast h
-  have hapos : 0 < (↑a.magnitude : ℝ) :=
-    lt_of_le_of_ne (NNReal.coe_nonneg _) (Ne.symm hamag)
-  set v := c * a.toReal with hv_def
-  cases hd : a.direction
-  · -- pos case: a.toReal > 0, so v > 0, fromReal returns pos
-    have htr : a.toReal = ↑a.magnitude := by simp [toReal, hd, Direction.toReal_pos]
-    have hv : 0 < v := by rw [hv_def, htr]; exact mul_pos hc hapos
-    show (fromReal v).direction = Direction.pos
-    have : 0 ≤ v := le_of_lt hv
-    simp [fromReal, this]
-  · -- neg case: a.toReal < 0, so v < 0, fromReal returns neg
-    have htr : a.toReal = -↑a.magnitude := by simp [toReal, hd, Direction.toReal_neg]
-    have hv : v < 0 := by rw [hv_def, htr]; nlinarith [mul_pos hc hapos]
-    show (fromReal v).direction = Direction.neg
-    have : ¬(0 ≤ v) := not_le.mpr hv
-    simp [fromReal, this]
+  cases a with
+  | mk magnitude direction wf =>
+      cases direction with
+      | pos =>
+          have hnonneg : 0 ≤ c * (magnitude : ℝ) := by
+            nlinarith [NNReal.coe_nonneg magnitude, hc]
+          simp [toReal, fromReal, Direction.toReal_pos, hnonneg]
+      | neg =>
+          have hmag_ne : magnitude ≠ 0 := by
+            intro h
+            have hzero_mag : (0 : AbsoluteValue).magnitude = 0 := by
+              change (fromReal 0).magnitude = 0
+              simp [fromReal]
+            apply ha
+            apply eq_mk
+            · calc
+                magnitude = 0 := h
+                _ = (0 : AbsoluteValue).magnitude := hzero_mag.symm
+            · exfalso
+              simpa using wf h
+          have hmag_pos : 0 < (magnitude : ℝ) := by
+            exact_mod_cast (show 0 < magnitude from pos_iff_ne_zero.mpr hmag_ne)
+          have hcmag_pos : 0 < c * (magnitude : ℝ) := by
+            nlinarith
+          have hbranch : ¬c * (magnitude : ℝ) ≤ 0 := not_le.mpr hcmag_pos
+          simp [toReal, fromReal, Direction.toReal_neg, hbranch]
+
+instance : CommRing AbsoluteValue :=
+  Function.Injective.commRing toReal toReal_injective
+    toReal_zero
+    toReal_one
+    toReal_add
+    toReal_mul
+    toReal_neg
+    toReal_sub
+    toReal_nsmul
+    toReal_zsmul
+    toReal_pow_nat
+    toReal_natCast
+    toReal_intCast
+
+noncomputable def ringEquivReal : AbsoluteValue ≃+* ℝ where
+  toFun := toReal
+  invFun := fromReal
+  left_inv := fromReal_of_toReal
+  right_inv := fromReal_toReal
+  map_mul' := toReal_mul
+  map_add' := toReal_add
+
+noncomputable instance : Field AbsoluteValue :=
+  (ringEquivReal.toMulEquiv.isField (Field.toIsField ℝ)).toField
+
+theorem mul_ne_zero_of_ne_zero {a b : AbsoluteValue} (ha : a ≠ 0) (hb : b ≠ 0) : a * b ≠ 0 := by
+  simpa using (mul_ne_zero ha hb : a * b ≠ (0 : AbsoluteValue))
+
+abbrev NonzeroAbsoluteValue := Units AbsoluteValue
 
 end AbsoluteValue
 
