@@ -265,6 +265,22 @@ The CI configuration enforces `--cov-fail-under=85` — the build fails if cover
 
 ---
 
+## Contributing
+
+Contributions are welcome, but Balansis is maintained under a dual-license
+model. Before opening a substantial pull request, read:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [CLA.md](CLA.md)
+- [LICENSING.md](LICENSING.md)
+- [NOTICE](NOTICE)
+
+This is especially important for externally sourced code, employer-owned work,
+and contributions that may later ship in both the open-source and commercial
+tracks.
+
+---
+
 ## tnsim: Zero-Sum Infinite Sets Simulator
 
 `tnsim/` is a standalone FastAPI service for experimenting with zero-sum infinite sets. It is **not included in the pip package** and must be run from the repository.

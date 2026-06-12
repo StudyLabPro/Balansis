@@ -9,7 +9,7 @@ homepage = "https://github.com/XTeam-Pro/Balansis"
 repository = "https://github.com/XTeam-Pro/Balansis"
 documentation = "https://github.com/XTeam-Pro/Balansis/tree/main/docs"
 packages = [{include = "balansis"}]
-include = ["balansis/py.typed", "LICENSE", "LICENSING.md", "COMMERCIAL_LICENSE.md"]
+include = ["balansis/py.typed", "LICENSE", "NOTICE", "LICENSING.md", "COMMERCIAL_LICENSE.md", "CLA.md", "CONTRIBUTING.md"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",

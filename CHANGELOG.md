@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Reworked repository licensing into a canonical dual-license layout: root `LICENSE` now contains the standard `AGPL-3.0` text, with `LICENSING.md` and `COMMERCIAL_LICENSE.md` documenting the commercial path
+- Added legal support documents: `NOTICE`, `CLA.md`, and contribution guidance aligned with dual licensing
+- Synced README, package metadata, `tnsim` metadata, and release workflow with the active licensing model
+- Corrected outdated formal-verification documentation so theorem names and architecture match the current Lean code
+
 ### Planned
 - Balansis v0.7 (next milestone): stable API, complete `linalg/` (GEMM, SVD, QR), PyTorch integration
 - ACT benchmark suite vs IEEE 754 and Kahan summation
@@ -29,41 +35,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-#### Lean4 Formal Proofs (`formal/BalansisFormal/`)
-Complete formalization of ACT using mathlib4 (v4.28.0). All 12 axioms proven — **0 sorry, 0 axioms, 0 errors**.
+#### Lean4 Formal Proofs (`formal/`)
+Initial repository integration of the Lean4 ACT formalization using Mathlib.
+This historical entry marks the first formal-proof milestone and was later
+superseded by the stronger `0.6.1` proof architecture, which now builds both
+`BalansisFormal` and `ACT` and documents the public theorems A1–A5, E1–E4,
+and S1–S3 directly.
 
-- **`Direction.lean`** (77 lines)
-  - `Direction` type: `Pos | Neg`
-  - 13 theorems: `neg_ne_pos`, `double_neg`, `mul_same`, `mul_diff`, `eq_or_ne`, etc.
-
-- **`AbsoluteValue.lean`** (305 lines)
-  - `AbsoluteValue` over ℝ (NNReal magnitude + Direction)
-  - `toReal` bridge: `toReal (mk m d) = m.toReal * d.toReal`
-  - `toReal_injective`: structural equality from real equality
-  - Axioms proven as theorems:
-    - **A1** `add_absolute_right`: additive identity (`ABSOLUTE` = zero analog)
-    - **A2** `add_comm`: commutativity
-    - **A3** `add_assoc`: associativity
-    - **A4** `add_inverse`: additive inverse exists (opposite direction, equal magnitude)
-    - **A5** `add_cancellation`: perfect cancellation (equal magnitude, opposite direction → ABSOLUTE)
-
-- **`EternalRatio.lean`** (208 lines)
-  - `EternalRatio` type (replaces IEEE 754 infinity)
-  - `mul_toReal` bridge proof
-  - Axioms proven as theorems:
-    - **E1** `mul_identity`: multiplicative identity
-    - **E2** `mul_comm`: commutativity
-    - **E3** `mul_assoc`: associativity
-    - **E4** `mul_inverse`: multiplicative inverse exists
-
-- **`Algebra.lean`** (192 lines)
-  - `mulInv`: proven via `congr_arg` with well-foundedness
-  - Axioms proven as theorems:
-    - **S1** `s1_distributivity`: left distributivity over addition
-    - **S2** `s2_mul_inverse`: inverse law via `rw [mul_toReal]` + `nlinarith`
-    - **S3** `s3_commutativity_with_add`: cross-structure commutativity
-
-- **`formal/README.md`** updated — build instructions with `lake build`
+- Introduced the `formal/` Lean project and Mathlib toolchain
+- Added the first machine-checked ACT proof modules
+- Wired formal build instructions into repository documentation
 
 #### CI/CD
 - `qa-gates.yml` in StudyNinja-Eco: lean-formal job now builds Balansis formal proofs in matrix strategy alongside MagicBrain

@@ -14,7 +14,7 @@ Strategic development plan for Balansis and Absolute Compensation Theory (ACT).
 | Core types (`AbsoluteValue`, `EternalRatio`) | Stable | Pydantic frozen=True, 45+ operations |
 | Compensated arithmetic | Stable | `compensated_add/mul/div/power`, near-cancellation detection |
 | Algebraic structures (`AbsoluteGroup`, `EternityField`) | Complete | All 12 axioms verified |
-| Lean4 formal proofs | Complete | 0 sorry, 0 axioms — `formal/BalansisFormal/` |
+| Lean4 formal proofs | Complete | 0 `sorry`, 0 `axiom`, public `ACT` facade + constructive `BalansisFormal` |
 | Linear algebra (`linalg/`) | Alpha | GEMM, SVD, QR implemented; benchmarks needed |
 | ML optimizer (`ml/optimizer.py`) | Alpha | `EternalOptimizer`, `EternalTorchOptimizer`; needs validation |
 | Finance module (`finance/ledger.py`) | Alpha | Exact cancellation accounting |
