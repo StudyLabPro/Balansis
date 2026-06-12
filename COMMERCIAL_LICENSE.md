@@ -1,121 +1,335 @@
-# Commercial / Enterprise License (Dual Licensing) — Balansis
+# Balansis Commercial License Agreement
 
-Copyright (c) 2024-2026 Tikhonov Andrey. All rights reserved.
+Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
 
-Author: Tikhonov Andrey
+This Commercial License Agreement ("Agreement") governs proprietary and other
+authorized commercial use of Balansis where the user does not wish to comply
+with the GNU Affero General Public License v3.0 ("AGPL-3.0"). This document is
+intended as the baseline legal form for paid Balansis commercial licensing. A
+binding commercial grant requires this Agreement together with an executed
+order form, invoice, quote acceptance, or other written commercial instrument
+issued or approved by the Licensor ("Order").
 
-This Commercial / Enterprise License (“Commercial License”) governs paid commercial use of Balansis and related modules, when such use is not permitted under the applicable community/open-core license.
+This document is a software license document, not legal advice. The Licensor
+and each Licensee should obtain counsel for jurisdiction-specific review before
+executing high-value or regulated transactions.
 
-This document is intended to be used as a licensing agreement template and does not constitute legal advice.
+## 1. Parties
 
-## 1. Definitions
+This Agreement is entered into between:
 
-- “Licensor” means Andrey Tikhonov and/or the legal entity designated by him to grant commercial rights.
-- “Licensee” means the individual or legal entity that purchases or otherwise receives a Commercial License from Licensor.
-- “Software” means the source code, binaries, documentation, and related materials provided by Licensor under this Commercial License.
-- “Open Core Components” means the parts of the Software that are distributed publicly under a community/open-core license intended for community value and non-commercial use.
-- “Enterprise Components” means proprietary, paid modules, features, integrations, accelerations, agents, tools, or other deliverables that Licensor makes available only under this Commercial License.
-- “Commercial Use” includes any use primarily intended for or directed toward commercial advantage or monetary compensation, including SaaS/hosted offerings, internal business platforms, production deployments, and integration into commercial products or services.
-- “Order” means the commercial document (invoice, order form, statement of work, or similar) that specifies fees, term, scope, support level, and any special terms for Licensee.
+- **Licensor**: Andrey Tikhonov, XTeam-Pro, or the legal entity designated by
+  the owner of Balansis to grant commercial rights.
+- **Licensee**: The individual or legal entity identified in the applicable
+  Order.
 
-## 2. Dual-Licensing Overview
+## 2. Definitions
 
-1. Open Core: Open Core Components are provided to the community for research, learning, personal projects, proofs-of-concept, and other non-commercial activities under the applicable community/open-core license.
-2. Commercial / Enterprise: Any Commercial Use requires a valid Commercial License (this document + an Order). Without a Commercial License, Commercial Use is not authorized.
-3. Module Matrix: Licensor may split deliverables into layers: (a) Open Core Components and (b) Enterprise Components available only under commercial subscription.
+For purposes of this Agreement:
 
-## 3. License Grant
+- **Software** means Balansis, including source code, object code, examples,
+  APIs, documentation, patches, and related materials supplied by Licensor.
+- **Commercial Use** means use for direct or indirect commercial advantage,
+  revenue generation, customer service delivery, internal business operations,
+  or incorporation into proprietary or paid products or services.
+- **Production Use** means use in any live, staged, customer-facing, or
+  business-critical environment.
+- **Affiliate** means an entity controlling, controlled by, or under common
+  control with Licensee, where "control" means ownership of more than fifty
+  percent of the voting interests or equivalent power.
+- **Order** means the commercial document that specifies the applicable fees,
+  scope, term, support tier, and any negotiated deviations from this Agreement.
+- **Documentation** means technical, operational, API, and licensing materials
+  provided by Licensor for the Software.
+- **Confidential Information** means non-public commercial, technical,
+  security, pricing, roadmap, support, or contractual information disclosed by
+  one party to the other that is marked confidential or should reasonably be
+  understood as confidential.
 
-Subject to continuous compliance with this Commercial License and payment of all applicable fees under the Order, Licensor grants Licensee a non-exclusive, non-transferable, revocable (for breach), worldwide license during the Term to:
+## 3. Dual-Licensing Model
 
-- use, reproduce, and modify the Software for Licensee’s internal business purposes and/or as expressly permitted in the Order;
-- deploy the Software in production, including within commercial environments, and offer it as part of Licensee’s products or services as expressly permitted in the Order;
-- access and use Enterprise Components provided to Licensee under the Order.
+Balansis is offered under a dual-licensing model:
+
+1. **Open-source option**: Users may use the Software under the AGPL-3.0 where
+   they are willing and able to comply with that license.
+2. **Commercial option**: Users who need proprietary, closed-source, internal
+   enterprise, OEM, embedded, SaaS, or other commercial rights not suitable for
+   AGPL-3.0 compliance must obtain a commercial license under this Agreement.
+
+No rights are granted under this Agreement unless the corresponding Order is in
+effect.
+
+## 4. License Grant
+
+Subject to Licensee's ongoing compliance with this Agreement and timely payment
+of all fees in the applicable Order, Licensor grants Licensee a limited,
+non-exclusive, non-transferable, non-sublicensable, revocable-for-breach,
+worldwide license during the Term to:
+
+- use, reproduce, install, run, and internally modify the Software;
+- use the Software in development, testing, staging, and Production Use;
+- embed or integrate the Software into Licensee's own products or services as
+  expressly permitted in the Order;
+- permit Licensee's employees and contractors acting on Licensee's behalf to
+  access and use the Software solely for Licensee's authorized purposes;
+- permit Licensee's Affiliates to use the Software only if and to the extent
+  expressly authorized in the Order.
 
 All rights not expressly granted are reserved by Licensor.
 
-## 4. Term, Renewal, and Scope
+## 5. Authorized Scope
 
-- Term: The Commercial License is effective for the period stated in the Order (“Term”).
-- Renewal: Renewal (if any) is as specified in the Order.
-- Scope: Authorized usage limits (seats, nodes, environments, customers, revenue tiers, or other metrics) are defined in the Order. Use beyond the ordered scope requires an updated Order.
+The scope of the commercial license is limited to the metrics stated in the
+Order, which may include one or more of the following:
 
-## 5. Restrictions
+- named users or seats;
+- developers or contributors;
+- servers, nodes, clusters, or CPU/GPU resources;
+- environments;
+- applications or products;
+- customers, tenants, or business units;
+- revenue bands or deployment classes;
+- support and service levels.
 
-Unless expressly permitted by Licensor in writing (including via an Order), Licensee must not:
+Use beyond the purchased scope requires a new or amended Order.
 
-- resell, sublicense, or otherwise redistribute the Software or Enterprise Components on a standalone basis;
-- provide the Enterprise Components (or access to them) to third parties except as embedded within Licensee’s permitted offering as specified in the Order;
-- remove or alter proprietary notices, trademarks, or attributions included with the Software;
-- use the Software in a manner that violates applicable law or third-party rights.
+## 6. Restrictions
 
-## 6. Support, Updates, and SLA
+Except as expressly permitted in the applicable Order, Licensee must not:
 
-Commercial benefits may include one or more of the following, as specified in the Order:
+- distribute, sublicense, lease, rent, lend, resell, timeshare, or otherwise
+  make the Software available on a standalone basis;
+- publish or redistribute source code of the Software except to Licensee's
+  authorized personnel and contractors bound by written confidentiality
+  obligations;
+- remove, obscure, or alter copyright, trademark, attribution, or license
+  notices;
+- use the Software to create, market, or operate a substantially similar
+  standalone mathematical library or hosted developer platform that competes
+  directly with Balansis as a product;
+- exceed scope limits stated in the Order;
+- use the Software in violation of applicable law, sanctions, export controls,
+  or third-party rights;
+- represent that Licensee owns the Software or any intellectual property in it.
 
-- Support: response targets, channels, and scope.
-- Updates: access to releases, security fixes, and patches during the Term.
-- SLA: availability targets and service credits (if applicable).
-- Consulting: architecture review, integrations, tuning, and other professional services.
+## 7. Internal Modifications and Derivatives
 
-If not specified in the Order, no SLA is provided, and support/updates are provided on a commercially reasonable efforts basis.
+Licensee may create internal modifications, adapters, build scripts, wrappers,
+ and derivative works of the Software for its authorized use under this
+Agreement. Unless otherwise agreed in writing:
 
-## 7. Closed Modules and Deliverables
+- Licensor retains ownership of the Software and all Licensor materials;
+- Licensee retains ownership of Licensee-specific code and materials created
+  independently of the Software;
+- to the extent Licensee provides feedback, suggestions, issue reports, or
+  proposed improvements to Licensor, Licensee grants Licensor a perpetual,
+  irrevocable, worldwide, royalty-free right to use and incorporate that
+  feedback without restriction.
 
-Enterprise Components may be delivered as proprietary source code, binary artifacts, hosted features, configuration bundles, model/tuning assets, tooling, or other deliverables. Enterprise Components are licensed, not sold.
+## 8. Redistribution and OEM Use
 
-Licensee acknowledges that:
+Redistribution, OEM packaging, on-prem delivery to end customers, managed
+service provider use, white-label delivery, or embedding the Software in a
+commercial product for third-party distribution is permitted only if expressly
+stated in the Order. If permitted, Licensee must ensure that:
 
-- Enterprise Components may not be publicly redistributed unless explicitly authorized;
-- Licensor may offer different Enterprise Components to different customers based on subscription tier and module matrix.
+- the Software remains subject to this Agreement;
+- end users receive only the rights approved in the Order;
+- Licensor's proprietary notices remain intact;
+- Licensee remains responsible for downstream compliance.
 
-## 8. Contributions and CLA
+## 9. Open-Source and Third-Party Components
 
-If Licensee or its personnel contribute code, documentation, or other materials to any publicly hosted repository within the Balansis ecosystem, such contributions may be subject to a Contributor License Agreement (“CLA”) required by Licensor. The CLA enables Licensor to manage dual licensing and future relicensing as needed.
+The Software may include or depend on third-party components licensed under
+their own terms. Those components remain subject to their respective licenses.
+This Agreement applies only to rights that Licensor is legally able to grant in
+Balansis and does not override third-party license obligations.
 
-## 9. Intellectual Property and Ownership
+## 10. Fees, Payment, and Taxes
 
-- Licensor retains all right, title, and interest in and to the Software, including Open Core Components and Enterprise Components, except for third-party components under their respective licenses.
-- Licensee retains all rights to its own data, configurations, and content.
-- Modifications: Unless otherwise agreed in the Order, Licensee owns its internal modifications, but grants Licensor a non-exclusive, perpetual, worldwide, royalty-free license to use, reproduce, and incorporate feedback and suggestions for improving the Software.
+Licensee must pay the fees specified in the Order according to the stated
+payment terms. Unless otherwise stated:
 
-## 10. Fees and Taxes
+- fees are non-cancelable and non-refundable once the Term begins;
+- late payments may accrue interest at the lesser of 1.5% per month or the
+  maximum rate permitted by law;
+- Licensee is responsible for applicable taxes, duties, VAT, GST, withholding,
+  or similar charges, excluding taxes based on Licensor's net income.
 
-Fees are as stated in the Order. Licensee is responsible for all applicable taxes, duties, and withholdings except taxes on Licensor’s net income.
+## 11. Term and Renewal
 
-## 11. Audit and Compliance
+This Agreement begins on the effective date stated in the Order and continues
+for the subscription or license term stated there ("Term"). Renewal, if any, is
+governed by the Order. If the Order does not specify renewal mechanics, the
+license expires automatically at the end of the Term.
 
-Upon reasonable notice and no more than once per 12-month period (unless a material breach is suspected), Licensor may request verification of compliance with scope limits in the Order. Licensee will provide reasonable information sufficient to confirm compliance. Any audit will be conducted in a manner that minimizes disruption and protects confidential information.
+## 12. Support, Maintenance, and Updates
 
-## 12. Confidentiality
+Support, maintenance, response targets, designated contacts, security update
+entitlements, and any service-level commitments are governed solely by the
+Order. If the Order is silent:
 
-Each party may receive non-public information from the other party that is marked or reasonably understood as confidential (“Confidential Information”). Each party will protect the other’s Confidential Information using reasonable safeguards and will not disclose it except to personnel/contractors who need to know and are bound by confidentiality obligations.
+- no service-level agreement is provided;
+- support is provided on a commercially reasonable efforts basis;
+- Licensor may determine release cadence, roadmap, and issue prioritization in
+  its sole discretion.
 
-## 13. Warranty Disclaimer
+## 13. Security and Responsible Use
 
-Except as expressly set forth in the Order, the Software is provided “AS IS” and “AS AVAILABLE”, without warranties of any kind, whether express, implied, or statutory, including warranties of merchantability, fitness for a particular purpose, non-infringement, or that the Software will be error-free or uninterrupted.
+Licensee is responsible for:
 
-## 14. Limitation of Liability
+- securing its own infrastructure, credentials, and deployment environment;
+- maintaining backups and disaster recovery procedures;
+- evaluating whether the Software is suitable for its intended use case,
+  including regulated or safety-critical workloads.
 
-To the maximum extent permitted by law, in no event will Licensor be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits, revenue, data, or goodwill, arising out of or related to this Commercial License, even if advised of the possibility of such damages.
+Unless explicitly agreed in writing, the Software is not licensed for use in
+life-support systems, critical public infrastructure, weapons systems, or other
+contexts where failure could reasonably result in death, bodily injury, or
+severe environmental harm.
 
-To the maximum extent permitted by law, Licensor’s total aggregate liability arising out of or related to this Commercial License will not exceed the fees paid by Licensee to Licensor under the applicable Order in the 12 months preceding the event giving rise to liability.
+## 14. Confidentiality
 
-## 15. Termination
+Each party will:
 
-- Termination for breach: Licensor may terminate this Commercial License immediately upon written notice if Licensee materially breaches and fails to cure within 30 days (or immediately for unauthorized redistribution or non-payment).
-- Effect of termination: Upon termination or expiration, Licensee must cease using the Enterprise Components and any rights granted under this Commercial License, except those that expressly survive.
-- Survival: Sections relating to ownership, restrictions, confidentiality, disclaimers, limitation of liability, and any payment obligations survive termination.
+- use the other party's Confidential Information only for purposes of this
+  Agreement;
+- protect it using at least reasonable care;
+- disclose it only to personnel, Affiliates, and contractors who need to know
+  it and are bound by confidentiality obligations no less protective than those
+  in this Agreement.
 
-## 16. Governing Law and Disputes
+Confidentiality obligations do not apply to information that the receiving party
+can demonstrate:
 
-Governing law, venue, and dispute resolution mechanism (court/arbitration) are as specified in the Order. If not specified, the parties will agree in good faith before initiating formal proceedings.
+- was already lawfully known without restriction;
+- becomes public through no fault of the receiving party;
+- is lawfully received from a third party without confidentiality obligation;
+- is independently developed without use of the disclosing party's Confidential
+  Information.
 
-## 17. Entire Agreement and Order of Precedence
+If disclosure is required by law, court order, or regulator, the receiving
+party will, where legally permitted, provide prompt notice and disclose only
+the minimum required information.
 
-This Commercial License plus the applicable Order constitutes the entire agreement regarding Commercial Use of the Software and supersedes prior discussions. In case of conflict, the Order controls for commercial terms (scope, fees, SLA), and this Commercial License controls for licensing and legal terms unless the Order explicitly overrides a section.
+## 15. Compliance Verification
 
-## 18. How to Obtain a Commercial License
+No more than once in any rolling twelve-month period, and only upon reasonable
+notice, Licensor may request written certification that Licensee is operating
+within the licensed scope. Licensee will provide reasonable records sufficient
+to confirm compliance. Any verification will be conducted in a manner that
+minimizes operational disruption and protects Licensee's Confidential
+Information.
 
-To use the Software commercially (SaaS, internal platforms, integrations in a product, or other Commercial Use), Licensee must obtain a paid Commercial License from Licensor and receive an Order confirming the scope and benefits (support, updates, SLA, consulting, and access to Enterprise Components).
+## 16. Intellectual Property
 
+Licensor and its licensors retain all right, title, and interest in and to the
+Software, Documentation, branding, and all related intellectual property. This
+Agreement is a license, not a sale. No implied licenses are granted.
+
+## 17. Warranty Disclaimer
+
+EXCEPT TO THE EXTENT EXPRESSLY STATED IN THE APPLICABLE ORDER, THE SOFTWARE AND
+DOCUMENTATION ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY
+KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT,
+AVAILABILITY, SECURITY, OR ERROR-FREE OPERATION.
+
+## 18. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW:
+
+- LICENSOR WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
+  CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR FOR ANY LOSS OF PROFITS,
+  REVENUE, GOODWILL, DATA, OR BUSINESS INTERRUPTION;
+- LICENSOR'S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT
+  WILL NOT EXCEED THE AMOUNTS PAID OR PAYABLE BY LICENSEE UNDER THE APPLICABLE
+  ORDER DURING THE TWELVE MONTHS PRECEDING THE EVENT GIVING RISE TO THE CLAIM.
+
+These limitations apply regardless of the theory of liability and even if a
+limited remedy fails of its essential purpose.
+
+## 19. Indemnity
+
+Unless otherwise specified in the Order:
+
+- Licensee will defend and indemnify Licensor against third-party claims arising
+  from Licensee's unlawful use of the Software, Licensee data, or Licensee's
+  products or services that embed the Software;
+- any intellectual property infringement indemnity by Licensor must be stated
+  expressly in the Order and does not arise by implication from this Agreement.
+
+## 20. Suspension and Termination
+
+Licensor may suspend or terminate this Agreement or the applicable Order if:
+
+- Licensee materially breaches this Agreement and fails to cure within thirty
+  days after written notice;
+- Licensee exceeds licensed scope and fails to promptly purchase the additional
+  scope or cease the excess use;
+- Licensee fails to pay undisputed fees when due and does not cure after notice;
+- Licensee becomes insolvent or subject to liquidation proceedings to the extent
+  permitted by law.
+
+Upon termination or expiration:
+
+- all rights granted under the terminated Order end immediately unless otherwise
+  stated in that Order;
+- Licensee must cease using the affected commercial rights and, upon request,
+  certify deletion or destruction of proprietary deliverables not authorized for
+  continued retention;
+- accrued payment obligations and provisions intended to survive will remain in
+  effect.
+
+## 21. Export Controls and Sanctions
+
+Licensee will comply with applicable export control, import control, sanctions,
+and trade laws. Licensee represents that it is not a prohibited or restricted
+party and will not use or transfer the Software in violation of such laws.
+
+## 22. Publicity
+
+Neither party may use the other party's name, logo, or trademarks in public
+marketing materials without prior written consent, except that Licensor may
+include Licensee's name in a confidential customer list and may publicly name
+Licensee as a customer only with Licensee's written approval.
+
+## 23. Assignment
+
+Licensee may not assign or transfer this Agreement, whether by operation of law,
+merger, acquisition, or otherwise, without Licensor's prior written consent,
+except to a successor in connection with a sale of substantially all of
+Licensee's business using the Software, provided the successor agrees in writing
+to be bound by this Agreement and all outstanding payment obligations are
+satisfied.
+
+## 24. Governing Law and Dispute Resolution
+
+The governing law, venue, and dispute resolution procedure will be specified in
+the applicable Order. If the Order is silent, the parties will negotiate in
+good faith a commercially reasonable dispute resolution clause before initiating
+formal proceedings.
+
+## 25. Entire Agreement and Order of Precedence
+
+This Agreement together with the applicable Order forms the complete agreement
+for the licensed commercial use of the Software and supersedes prior proposals,
+emails, and discussions on the same subject. If there is a conflict:
+
+1. the Order controls for commercial terms such as scope, fees, support, and
+   service levels;
+2. this Agreement controls for baseline licensing and legal terms unless the
+   Order expressly overrides a specific section.
+
+## 26. Contact
+
+Commercial licensing inquiries, quote requests, and enterprise contracting:
+
+- Email: `andrew@xteam.pro`
+- Website: [https://xteam.pro](https://xteam.pro)
+
+## 27. Execution Requirement
+
+This repository copy of the Agreement describes the standard commercial terms.
+Commercial Use is authorized only after Licensor issues or countersigns an
+applicable Order confirming the Licensee, scope, fees, and effective term.

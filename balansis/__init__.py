@@ -5,7 +5,7 @@
 #   1. GNU Affero General Public License v3.0 (AGPLv3) for open-source use.
 #   2. A Commercial License for proprietary and corporate use.
 #
-# See the LICENSE file in the project root for full licensing terms.
+# See LICENSING.md in the project root for license selection details.
 # For commercial licensing: andrew@xteam.pro
 """Balansis: Python mathematical library implementing Absolute Compensation Theory (ACT).
 
@@ -43,7 +43,7 @@ from balansis.compat import CompensatedSum, StableSoftmax, CompensatedMatMul
 __version__ = "0.6.1"
 __author__ = "Andrey Tikhonov (XTeam-Pro)"
 __email__ = "andrew@xteam.pro"
-__license__ = "AGPLv3 / Commercial — see LICENSE and LICENSE-COMMERCIAL"
+__license__ = "AGPL-3.0 / Commercial — see LICENSE, LICENSING.md, and COMMERCIAL_LICENSE.md"
 
 # ACT Constants
 ABSOLUTE = AbsoluteValue(magnitude=0.0, direction=1)

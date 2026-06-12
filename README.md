@@ -2,7 +2,7 @@
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://python.org)
 [![Coverage](https://img.shields.io/badge/coverage-85%25%2B-brightgreen.svg)](https://github.com/XTeam-Pro/Balansis)
 [![Lean4](https://img.shields.io/badge/Lean4-A1--A5%2C%20E1--E4%2C%20S1--S3%20proved-blueviolet.svg)](./formal/)
-[![License](https://img.shields.io/badge/license-MIT%20%2F%20Commercial-blue.svg)](./COMMERCIAL_LICENSE.md)
+[![License](https://img.shields.io/badge/license-AGPL--3.0%20%2F%20Commercial-blue.svg)](./LICENSING.md)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 # Balansis
@@ -285,12 +285,24 @@ uvicorn tnsim.api.main:app --port 8010
 
 ## License
 
-Balansis uses **dual licensing**:
+Balansis is **dual-licensed**:
 
-- **MIT License** ([LICENSE](LICENSE)) — free for non-commercial use: research, education, personal projects, proof-of-concept work.
-- **Commercial License** ([COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md)) — required for commercial use: SaaS products, production deployments, integration into commercial software.
+- **AGPL-3.0**: the canonical open-source license text is in [LICENSE](LICENSE).
+- **Commercial License**: proprietary commercial terms are in [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md).
+- **Overview and routing guide**: see [LICENSING.md](LICENSING.md) to decide which path applies to your use case.
 
-Copyright (c) 2024-2026 Tikhonov Andrey. All rights reserved.
+Practical rule:
+
+- choose **AGPL-3.0** if you are prepared to comply with AGPL obligations;
+- choose the **commercial license** if you need proprietary, internal
+  enterprise, SaaS, OEM, or other closed-source commercial rights.
+
+GitHub license detection is driven by the canonical open-source text in the
+root `LICENSE` file. The repository therefore keeps the standard AGPL text in
+`LICENSE` and documents the commercial option separately in `LICENSING.md` and
+`COMMERCIAL_LICENSE.md`.
+
+Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
 
 ---
 

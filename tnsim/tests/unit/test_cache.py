@@ -21,7 +21,7 @@ Test Categories:
 
 Author: TNSIM Development Team
 Version: 0.6.1
-License: MIT
+License: AGPL-3.0 / Commercial via the parent Balansis repository
 """
 
 import pytest

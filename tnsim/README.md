@@ -3,7 +3,7 @@
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-blue.svg)](https://www.postgresql.org/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-AGPL--3.0%20%2F%20Commercial-blue.svg)](../LICENSING.md)
 
 **TNSIM** (Theory of Zero-Sum Infinite Sets) is an innovative library for working with zero-sum sets and high-precision computations with rounding error compensation.
 
@@ -369,7 +369,12 @@ parallel_processor = ParallelTNSIM(
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+`tnsim` is distributed as part of the Balansis repository and follows the same
+dual-licensing model:
+
+- open-source use under [AGPL-3.0](../LICENSE)
+- proprietary commercial use under [COMMERCIAL_LICENSE.md](../COMMERCIAL_LICENSE.md)
+- routing guidance in [LICENSING.md](../LICENSING.md)
 
 ## 👥 Authors
 
