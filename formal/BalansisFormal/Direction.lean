@@ -1,3 +1,6 @@
+-- Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
+-- This file is part of Balansis, dual-licensed under AGPLv3 / Commercial.
+-- See LICENSE in the project root. Commercial use: andrew@xteam.pro
 /-
   BalansisFormal.Direction — Sign type for ACT
 
@@ -15,7 +18,7 @@ deriving DecidableEq, Repr
 
 namespace Direction
 
-noncomputable def toReal : Direction → ℝ
+def toReal : Direction → ℝ
   | pos => 1
   | neg => -1
 

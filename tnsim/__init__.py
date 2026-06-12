@@ -23,7 +23,7 @@ __author__ = "TNSIM Team"
 __email__ = "contact@tnsim.org"
 __description__ = "Theory of Zero-Sum Infinite Sets"
 __url__ = "https://github.com/tnsim/tnsim"
-__license__ = "MIT"
+__license__ = "AGPL-3.0 / Commercial via parent Balansis repository"
 
 # Import main classes
 try:

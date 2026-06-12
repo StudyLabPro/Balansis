@@ -10,6 +10,34 @@ on:
     - cron: '0 2 * * *'
 
 jobs:
+  formal:
+    name: Formal Lean Audit
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Lean toolchain
+      run: |
+        curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+        echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+    - name: Build Lean libraries
+      run: |
+        cd formal
+        lake build
+        lake build BalansisFormal
+        lake build ACT
+        lake env lean ACT/Absolute.lean
+        lake env lean ACT/Algebra.lean
+        lake env lean FormalAudit.lean
+
+    - name: Audit Lean sources
+      run: |
+        ! grep -Rnw formal --include='*.lean' -e '\baxiom\b'
+        ! grep -Rnw formal --include='*.lean' -e '\bsorry\b'
+        ! grep -Rnw formal --include='*.lean' -e '\badmit\b'
+
   test:
     name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}

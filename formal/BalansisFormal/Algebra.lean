@@ -1,192 +1,111 @@
-/-
-  BalansisFormal.Algebra — Structural axioms S1–S3
+-- Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
+-- This file is part of Balansis, dual-licensed under AGPLv3 / Commercial.
+-- See LICENSE in the project root. Commercial use: andrew@xteam.pro
+/- 
+  BalansisFormal.Algebra — structural laws proved on the actual types.
 
-  S1: (AbsoluteValue, add, absolute, neg) is an abelian group
-  S2: (AbsoluteValue \ {absolute}, mul, one, mulInv) is an abelian group
-  S3: (EternalRatio, add, mul) forms a field
-
-  All axioms are proven as theorems via the toReal bridge:
-    1. Prove the identity holds on toReal (using ℝ's properties)
-    2. Apply toReal_injective to lift to structural equality
+  `AbsoluteValue` is the constructive signed-magnitude model.
+  `EternalRatio` is the quotient field built from non-zero denominator pairs.
 -/
 import Mathlib
 import BalansisFormal.EternalRatio
 
-open scoped NNReal
-
 namespace BalansisFormal
 
--- ====================================================================
--- S1: Additive Abelian Group on AbsoluteValue
--- ====================================================================
+noncomputable section
 
 namespace AbsoluteValue
 
-/-- S1.1 (Closure): Addition is closed by construction. -/
-theorem s1_closure (_a _b : AbsoluteValue) : True := trivial
+theorem s1_closure (a b : AbsoluteValue) : ∃ c : AbsoluteValue, c = a + b := ⟨a + b, rfl⟩
 
-/-- S1.2 (Associativity): (a + b) + c = a + (b + c). -/
-theorem s1_associativity (a b c : AbsoluteValue) :
-    (a.add b).add c = a.add (b.add c) := by
+theorem s1_associativity (a b c : AbsoluteValue) : (a + b) + c = a + (b + c) := by
   apply toReal_injective
-  rw [add_toReal, add_toReal, add_toReal, add_toReal]
-  ring
+  ring_nf
 
-/-- S1.3 (Commutativity): a + b = b + a. -/
-theorem s1_commutativity (a b : AbsoluteValue) :
-    a.add b = b.add a := by
+theorem s1_commutativity (a b : AbsoluteValue) : a + b = b + a := by
   apply toReal_injective
-  rw [add_toReal, add_toReal]
-  ring
+  ring_nf
 
-/-- S1.4 (Identity): a + absolute = a. -/
-theorem s1_identity_right (a : AbsoluteValue) :
-    a.add absolute = a :=
-  a4_identity_right a
+theorem s1_identity_right (a : AbsoluteValue) : a + 0 = a :=
+  a4_additive_identity a
 
-/-- S1.4 (Identity): absolute + a = a. -/
-theorem s1_identity_left (a : AbsoluteValue) :
-    absolute.add a = a :=
-  a4_identity_left a
+theorem s1_identity_left (a : AbsoluteValue) : (0 : AbsoluteValue) + a = a :=
+  a4_additive_identity_left a
 
-/-- S1.5 (Inverse): a + neg(a) = absolute. -/
-theorem s1_inverse (a : AbsoluteValue) :
-    a.add (a.neg) = absolute := by
+theorem s1_inverse (a : AbsoluteValue) : a + (-a) = 0 := by
   apply toReal_injective
-  rw [add_toReal, neg_toReal, absolute_toReal]
-  ring
+  ring_nf
 
--- ====================================================================
--- S2: Multiplicative Abelian Group on AbsoluteValue \ {absolute}
--- ====================================================================
+theorem s2_closure (a b : AbsoluteValue) (ha : a ≠ 0) (hb : b ≠ 0) : a * b ≠ 0 :=
+  mul_ne_zero_of_ne_zero ha hb
 
-/-- S2.1 (Closure): Product of non-absolute values is non-absolute. -/
-theorem s2_closure (a b : AbsoluteValue)
-    (ha : ¬isAbsolute a) (hb : ¬isAbsolute b) :
-    ¬isAbsolute (a.mul b) :=
-  EternalRatio.mul_not_absolute ha hb
-
-/-- S2.2 (Associativity): (a * b) * c = a * (b * c). -/
-theorem s2_mul_associativity (a b c : AbsoluteValue) :
-    (a.mul b).mul c = a.mul (b.mul c) := by
+theorem s2_mul_associativity (a b c : AbsoluteValue) : (a * b) * c = a * (b * c) := by
   apply toReal_injective
-  rw [mul_toReal, mul_toReal, mul_toReal, mul_toReal]
-  ring
+  ring_nf
 
-/-- S2.3 (Commutativity): a * b = b * a. -/
-theorem s2_mul_commutativity (a b : AbsoluteValue) :
-    a.mul b = b.mul a := by
+theorem s2_mul_commutativity (a b : AbsoluteValue) : a * b = b * a := by
   apply toReal_injective
-  rw [mul_toReal, mul_toReal]
-  ring
+  ring_nf
 
-/-- S2.4 (Identity right): a * one = a. -/
-theorem s2_mul_identity_right (a : AbsoluteValue) :
-    a.mul one = a := by
+theorem s2_mul_identity_right (a : AbsoluteValue) : a * 1 = a := by
   apply toReal_injective
-  rw [mul_toReal, one_toReal, _root_.mul_one]
+  ring_nf
 
-/-- S2.4 (Identity left): one * a = a. -/
-theorem s2_mul_identity_left (a : AbsoluteValue) :
-    one.mul a = a := by
+theorem s2_mul_identity_left (a : AbsoluteValue) : (1 : AbsoluteValue) * a = a := by
   apply toReal_injective
-  rw [mul_toReal, one_toReal, _root_.one_mul]
+  ring_nf
 
-/-- Multiplicative inverse: 1/magnitude, same direction. -/
-noncomputable def mulInv (a : AbsoluteValue) (h : ¬isAbsolute a) : AbsoluteValue :=
-  { magnitude := ⟨1 / (a.magnitude : ℝ), by
-      simp [isAbsolute] at h
-      exact div_nonneg one_pos.le (NNReal.coe_nonneg _)⟩
-    direction := a.direction
-    wf := by
-      intro hmag
-      exfalso
-      simp only [isAbsolute] at h
-      have hpos : (0 : ℝ) < ↑a.magnitude := NNReal.coe_pos.mpr (pos_iff_ne_zero.mpr h)
-      have h0 := congr_arg (fun x : NNReal => (x : ℝ)) hmag
-      simp at h0
-      exact absurd h0 h }
+theorem s2_mul_inverse (a : AbsoluteValue) (ha : a ≠ 0) : a * a⁻¹ = 1 := by
+  apply toReal_injective
+  have hreal : a.toReal ≠ 0 := AbsoluteValue.nonzero_toReal_ne_zero ha
+  simp [hreal]
 
-/-- S2.5 (Inverse): a * mulInv(a) has toReal = 1 for non-absolute a. -/
-theorem s2_mul_inverse (a : AbsoluteValue) (h : ¬isAbsolute a) :
-    (a.mul (a.mulInv h)).toReal = 1 := by
-  rw [mul_toReal]
-  simp only [isAbsolute] at h
-  have hpos : (0 : ℝ) < ↑a.magnitude := NNReal.coe_pos.mpr (pos_iff_ne_zero.mpr h)
-  have hne : (↑a.magnitude : ℝ) ≠ 0 := ne_of_gt hpos
-  simp [toReal, mulInv]
-  have dsq := Direction.toReal_sq a.direction
-  field_simp
-  nlinarith
-
--- ====================================================================
--- Distributivity: a * (b + c) = a*b + a*c
--- ====================================================================
-
-/-- Multiplication distributes over addition. -/
-theorem mul_add_distrib (a b c : AbsoluteValue) :
-    (a.mul (b.add c)).toReal = ((a.mul b).add (a.mul c)).toReal := by
-  rw [mul_toReal, add_toReal, add_toReal, mul_toReal, mul_toReal]
-  ring
+theorem mul_add_distrib (a b c : AbsoluteValue) : a * (b + c) = a * b + a * c := by
+  apply toReal_injective
+  ring_nf
 
 end AbsoluteValue
 
--- ====================================================================
--- S3: EternalRatio Field
--- ====================================================================
-
 namespace EternalRatio
 
-/-- S3.1a (Additive associativity): (r₁ + r₂) + r₃ = r₁ + (r₂ + r₃). -/
-theorem s3_add_assoc (r₁ r₂ r₃ : EternalRatio) :
-    ((r₁.add r₂).add r₃).toReal = (r₁.add (r₂.add r₃)).toReal := by
-  rw [add_toReal, add_toReal, add_toReal, add_toReal]
-  ring
+theorem s3_add_assoc (r₁ r₂ r₃ : EternalRatio) : (r₁ + r₂) + r₃ = r₁ + (r₂ + r₃) := by
+  apply toReal_injective
+  ring_nf
 
-/-- S3.1b (Additive commutativity): r₁ + r₂ = r₂ + r₁. -/
-theorem s3_add_comm (r₁ r₂ : EternalRatio) :
-    (r₁.add r₂).toReal = (r₂.add r₁).toReal := by
-  rw [add_toReal, add_toReal]
-  ring
+theorem s3_add_comm (r₁ r₂ : EternalRatio) : r₁ + r₂ = r₂ + r₁ := by
+  apply toReal_injective
+  ring_nf
 
-/-- S3.1c (Additive identity): r + zero = r. -/
-theorem s3_add_identity (r : EternalRatio) :
-    (r.add zero).toReal = r.toReal :=
-  add_zero_right r
+theorem s3_add_identity (r : EternalRatio) : r + zero = r := by
+  apply toReal_injective
+  simp [zero]
 
-/-- S3.1d (Additive inverse): r + neg(r) = 0. -/
-theorem s3_add_inverse (r : EternalRatio) :
-    (r.add r.neg).toReal = 0 :=
-  add_neg_self r
+theorem s3_add_inverse (r : EternalRatio) : r + (-r) = zero := by
+  apply toReal_injective
+  simp [zero]
 
-/-- S3.2a (Multiplicative associativity): (r₁ * r₂) * r₃ = r₁ * (r₂ * r₃). -/
-theorem s3_mul_assoc (r₁ r₂ r₃ : EternalRatio) :
-    ((r₁.mul r₂).mul r₃).toReal = (r₁.mul (r₂.mul r₃)).toReal := by
-  rw [mul_toReal, mul_toReal, mul_toReal, mul_toReal]
-  ring
+theorem s3_mul_assoc (r₁ r₂ r₃ : EternalRatio) : (r₁ * r₂) * r₃ = r₁ * (r₂ * r₃) := by
+  apply toReal_injective
+  ring_nf
 
-/-- S3.2b (Multiplicative commutativity): r₁ * r₂ = r₂ * r₁. -/
-theorem s3_mul_comm (r₁ r₂ : EternalRatio) :
-    (r₁.mul r₂).toReal = (r₂.mul r₁).toReal := by
-  rw [mul_toReal, mul_toReal]
-  ring
+theorem s3_mul_comm (r₁ r₂ : EternalRatio) : r₁ * r₂ = r₂ * r₁ := by
+  apply toReal_injective
+  ring_nf
 
-/-- S3.2c (Multiplicative identity): r * unity = r. -/
-theorem s3_mul_identity (r : EternalRatio) :
-    (r.mul unity).toReal = r.toReal :=
-  e3_identity_right r
+theorem s3_mul_identity (r : EternalRatio) : r * unity = r :=
+  e3_multiplicative_identity r
 
-/-- S3.2d (Multiplicative inverse): r * inv(r) = 1 for non-zero r. -/
-theorem s3_mul_inverse (r : EternalRatio) (h : ¬AbsoluteValue.isAbsolute r.numerator) :
-    (r.mul (r.inv h)).toReal = 1 :=
-  e4_inverse r h
+theorem s3_mul_inverse (r : EternalRatio) (hr : r ≠ zero) : r * r⁻¹ = unity :=
+  e4_inverse r hr
 
-/-- S3.3 (Distributivity): a * (b + c) = a*b + a*c. -/
-theorem s3_distributivity (a b c : EternalRatio) :
-    (a.mul (b.add c)).toReal = ((a.mul b).add (a.mul c)).toReal := by
-  rw [mul_toReal, add_toReal, add_toReal, mul_toReal, mul_toReal]
-  ring
+theorem s3_distributivity (a b c : EternalRatio) : a * (b + c) = a * b + a * c := by
+  apply toReal_injective
+  ring_nf
+
+noncomputable def eternal_ratio_field : Field EternalRatio := inferInstance
 
 end EternalRatio
+
+end
 
 end BalansisFormal

@@ -1,3 +1,6 @@
+-- Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
+-- This file is part of Balansis, dual-licensed under AGPLv3 / Commercial.
+-- See LICENSE in the project root. Commercial use: andrew@xteam.pro
 import Lake
 open Lake DSL
 
@@ -9,3 +12,6 @@ require mathlib from git
 
 @[default_target]
 lean_lib BalansisFormal
+
+@[default_target]
+lean_lib ACT
