@@ -1,21 +1,51 @@
-MIT License
+# Dual Licensing Agreement for Balansis
 
-Copyright (c) 2024-2026 Tikhonov Andrey
+Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Balansis is distributed under a dual-licensing model. Depending on your use
+case, you must choose ONE of the following paths:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+---
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## 1. Open Source License — GNU AGPLv3
+
+If you are developing open-source software, performing academic research, or
+are willing to open-source your entire application's source code under the
+AGPLv3, you may use Balansis for free.
+
+**Crucial Condition:** According to the AGPLv3, if you modify Balansis or
+integrate it into a software system that interacts with users remotely over a
+network (e.g., cloud services, SaaS, AI/ML web-services, REST APIs), you
+**MUST make your entire system's source code available to the public** under
+the AGPLv3 license.
+
+See `LICENSE-AGPLv3` for the full legal text.
+
+---
+
+## 2. Commercial / Enterprise License
+
+If you wish to integrate Balansis into proprietary software, commercial
+products, internal enterprise platforms, closed-source SaaS applications, or
+revenue-generating AI/ML production pipelines where you **cannot or do not
+want to disclose your source code**, you CANNOT use the AGPLv3 version.
+
+In this case, you **must purchase a Commercial License** from the copyright
+holder.
+
+The Commercial License grants you the right to:
+- Keep your source code private
+- Deploy Balansis in commercial and production environments
+- Receive production stability warranties and priority support
+
+For commercial licensing terms, pricing, and enterprise agreements:
+
+  **Email:** andrew@xteam.pro
+  **Website:** https://xteam.pro
+
+See `LICENSE-COMMERCIAL` for the commercial license template.
+
+---
+
+BY DOWNLOADING, INSTALLING, OR USING BALANSIS, YOU AGREE TO BE BOUND BY
+ONE OF THESE LICENSES. IF YOU DO NOT AGREE, DO NOT USE THIS SOFTWARE.

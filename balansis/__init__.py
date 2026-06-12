@@ -1,5 +1,12 @@
-# Copyright (c) 2024-2026 Tikhonov Andrey. All rights reserved.
-# SPDX-License-Identifier: MIT (non-commercial) | Commercial use: see COMMERCIAL_LICENSE.md
+# Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
+#
+# This file is part of Balansis.
+# Balansis is dual-licensed under:
+#   1. GNU Affero General Public License v3.0 (AGPLv3) for open-source use.
+#   2. A Commercial License for proprietary and corporate use.
+#
+# See the LICENSE file in the project root for full licensing terms.
+# For commercial licensing: andrew@xteam.pro
 """Balansis: Python mathematical library implementing Absolute Compensation Theory (ACT).
 
 This library provides a novel framework replacing traditional zero and infinity
@@ -34,9 +41,9 @@ from balansis.compat import CompensatedSum, StableSoftmax, CompensatedMatMul
 # from balansis.utils.plot import PlotUtils  # Temporarily disabled
 
 __version__ = "0.6.1"
-__author__ = "Tikhonov Andrey"
-__email__ = "balansis@xteam.pro"
-__license__ = "MIT (non-commercial) / Commercial — see COMMERCIAL_LICENSE.md"
+__author__ = "Andrey Tikhonov (XTeam-Pro)"
+__email__ = "andrew@xteam.pro"
+__license__ = "AGPLv3 / Commercial — see LICENSE and LICENSE-COMMERCIAL"
 
 # ACT Constants
 ABSOLUTE = AbsoluteValue(magnitude=0.0, direction=1)

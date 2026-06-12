@@ -2,19 +2,20 @@
 name = "balansis"
 version = "0.6.1"
 description = "Python library implementing Absolute Compensation Theory (ACT) — stable arithmetic replacing IEEE 754 zero and infinity"
-authors = ["Tikhonov Andrey <balansis@xteam.pro>"]
-license = "MIT"
+authors = ["Andrey Tikhonov <andrew@xteam.pro>"]
+license = "AGPL-3.0-only"
 readme = "README.md"
 homepage = "https://github.com/XTeam-Pro/Balansis"
 repository = "https://github.com/XTeam-Pro/Balansis"
 documentation = "https://github.com/XTeam-Pro/Balansis/tree/main/docs"
 packages = [{include = "balansis"}]
-include = ["balansis/py.typed"]
+include = ["balansis/py.typed", "LICENSE", "LICENSE-AGPLv3", "LICENSE-COMMERCIAL"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "License :: Other/Proprietary License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -23,7 +24,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
-keywords = ["mathematics", "numerical-stability", "compensation-theory", "absolute", "eternity", "ieee754", "kahan"]
+keywords = ["mathematics", "numerical-stability", "compensation-theory", "absolute", "eternity", "ieee754", "kahan", "agpl"]
 
 [tool.poetry.dependencies]
 python = "^3.10"

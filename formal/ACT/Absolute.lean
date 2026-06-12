@@ -1,3 +1,6 @@
+-- Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
+-- This file is part of Balansis, dual-licensed under AGPLv3 / Commercial.
+-- See LICENSE in the project root. Commercial use: andrew@xteam.pro
 /-
   ACT.Absolute — Formal axiomatization of AbsoluteValue (A1–A5)
 
