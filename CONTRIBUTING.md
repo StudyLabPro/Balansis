@@ -1,476 +1,142 @@
 # Contributing to Balansis
 
-Добро пожаловать в проект Balansis! Мы рады, что вы хотите внести свой вклад в развитие Algebraic Compensation Theory (ACT) и её реализации.
+Thank you for your interest in Balansis.
 
-## 📋 Содержание
+Balansis is maintained as a scientific and engineering codebase, so good
+contributions improve not only the code, but also its documentation,
+testability, and conceptual clarity.
 
-- [Кодекс поведения](#кодекс-поведения)
-- [Как внести вклад](#как-внести-вклад)
-- [Настройка среды разработки](#настройка-среды-разработки)
-- [Стандарты кода](#стандарты-кода)
-- [Тестирование](#тестирование)
-- [Документация](#документация)
-- [Процесс Pull Request](#процесс-pull-request)
-- [Отчеты об ошибках](#отчеты-об-ошибках)
-- [Предложения новых функций](#предложения-новых-функций)
-- [Релизы и версионирование](#релизы-и-версионирование)
+## Conduct
 
-## 🤝 Кодекс поведения
+Contribute respectfully, constructively, and professionally.
 
-Участвуя в этом проекте, вы соглашаетесь вести себя уважительно, конструктивно и профессионально. Мы стремимся поддерживать открытую и дружелюбную среду для всех участников.
+We value:
 
-### Основные принципы:
-- **Уважение**: Относитесь с уважением ко всем участникам
-- **Конструктивность**: Предоставляйте конструктивную обратную связь
-- **Инклюзивность**: Приветствуем участников любого уровня опыта
-- **Научность**: Основывайте предложения на математических принципах
+- respect for other contributors
+- evidence-based technical discussion
+- clear reproduction steps and examples
+- honesty about limitations, assumptions, and trade-offs
 
-## ⚖️ Лицензирование и CLA
+## Before You Contribute
 
-Balansis использует dual-license модель:
+Read these documents first:
 
-- open-source путь: `AGPL-3.0`
-- коммерческий путь: отдельная proprietary license
+- [README.md](README.md)
+- [docs/index.md](docs/index.md)
+- [docs/standards.md](docs/standards.md)
+- [LICENSING.md](LICENSING.md)
+- [CLA.md](CLA.md)
+- [SECURITY.md](SECURITY.md)
 
-Перед отправкой существенного вклада обязательно прочитайте:
+## Licensing and CLA
+
+Balansis uses a dual-license model:
+
+- open-source track: `AGPL-3.0`
+- commercial track: separate commercial terms
+
+By contributing substantial material, you confirm that you have the right to do
+so and that the contribution can participate in the repository's dual-license
+model. See:
 
 - [LICENSING.md](LICENSING.md)
 - [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md)
 - [CLA.md](CLA.md)
 
-Отправляя вклад, вы подтверждаете, что имеете права на код и предоставляете
-мейнтейнерам достаточные права для публикации вклада как в open-source ветке,
-так и в коммерческой лицензии Balansis. Если вы вносите вклад от имени
-компании или университета, убедитесь, что у вас есть соответствующее
-разрешение.
+## Local Development Setup
 
-## 🚀 Как внести вклад
+Requirements:
 
-### Типы вкладов, которые мы приветствуем:
-
-1. **🐛 Исправление ошибок**
-   - Исправления в коде
-   - Улучшения производительности
-   - Исправления в документации
-
-2. **✨ Новые функции**
-   - Реализация новых алгебраических операций
-   - Улучшения алгоритмов компенсации
-   - Новые утилиты и инструменты
-
-3. **📚 Документация**
-   - Улучшение существующей документации
-   - Добавление примеров использования
-   - Переводы на другие языки
-
-4. **🧪 Тестирование**
-   - Написание новых тестов
-   - Улучшение покрытия тестами
-   - Бенчмарки и тесты производительности
-
-5. **🔬 Исследования**
-   - Математические доказательства
-   - Анализ алгоритмов
-   - Сравнительные исследования
-
-## 🛠 Настройка среды разработки
-
-### Требования
-
-- Python 3.8+
+- Python 3.10+
+- Poetry
 - Git
-- pip или poetry
-
-### Установка
-
-1. **Клонируйте репозиторий:**
-   ```bash
-   git clone https://github.com/your-username/balansis.git
-   cd balansis
-   ```
-
-2. **Создайте виртуальное окружение:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Linux/Mac
-   # или
-   venv\Scripts\activate     # Windows
-   ```
-
-3. **Установите зависимости:**
-   ```bash
-   pip install -e ".[dev]"
-   ```
-
-4. **Установите pre-commit hooks:**
-   ```bash
-   pre-commit install
-   ```
-
-### Структура проекта
-
-```
-balansis/
-├── balansis/           # Основной код библиотеки
-│   ├── core/          # Основные классы (AbsoluteValue, EternalRatio)
-│   ├── logic/         # Логические операции
-│   ├── algebra/       # Алгебраические структуры
-│   └── utils/         # Утилиты и вспомогательные функции
-├── tests/             # Тесты
-├── benchmarks/        # Бенчмарки и тесты производительности
-├── docs/              # Документация
-├── examples/          # Примеры использования
-└── scripts/           # Скрипты для разработки
-```
-
-## 📝 Стандарты кода
-
-### Python Code Style
-
-Мы следуем [PEP 8](https://pep8.org/) с некоторыми дополнениями:
-
-- **Максимальная длина строки**: 88 символов (Black formatter)
-- **Импорты**: Используйте `isort` для сортировки
-- **Типизация**: Обязательные type hints для всех публичных функций
-- **Docstrings**: Google style для всех публичных методов
-
-### Инструменты форматирования
 
 ```bash
-# Форматирование кода
-black balansis/ tests/
-
-# Сортировка импортов
-isort balansis/ tests/
-
-# Проверка типов
-mypy balansis/
-
-# Линтинг
-flake8 balansis/ tests/
+git clone https://github.com/XTeam-Pro/Balansis.git
+cd Balansis
+poetry install
+poetry run pre-commit install
 ```
 
-### Пример оформления кода
+Related contributor setup docs:
 
-```python
-from typing import Union, Optional
-from decimal import Decimal
+- [docs/contributor/development-setup.md](docs/contributor/development-setup.md)
+- [docs/architecture/repository-map.md](docs/architecture/repository-map.md)
 
-class AbsoluteValue:
-    """
-    Представляет абсолютное значение в рамках ACT.
-    
-    Args:
-        magnitude: Величина значения
-        direction: Направление (положительное/отрицательное)
-        
-    Raises:
-        ValueError: Если magnitude отрицательная
-        
-    Example:
-        >>> av = AbsoluteValue(5.0, True)
-        >>> print(av.to_float())
-        5.0
-    """
-    
-    def __init__(
-        self, 
-        magnitude: Union[float, Decimal], 
-        direction: bool = True
-    ) -> None:
-        if magnitude < 0:
-            raise ValueError("Magnitude must be non-negative")
-        
-        self.magnitude = magnitude
-        self.direction = direction
-    
-    def to_float(self) -> float:
-        """Конвертирует в float значение."""
-        return float(self.magnitude) * (1 if self.direction else -1)
-```
+## Quality Gates
 
-## 🧪 Тестирование
-
-### Запуск тестов
+Run these before opening a pull request:
 
 ```bash
-# Все тесты
-pytest
-
-# С покрытием
-pytest --cov=balansis --cov-report=html
-
-# Только быстрые тесты
-pytest -m "not slow"
-
-# Бенчмарки
-pytest benchmarks/ -v
+poetry run pytest
+poetry run mypy balansis/
+poetry run black balansis/ tests/ --check
+poetry run isort balansis/ tests/ --check-only
+poetry run flake8 balansis/
 ```
 
-### Написание тестов
+If you touch the Lean layer:
 
-1. **Размещение**: Тесты в директории `tests/` с соответствующей структурой
-2. **Именование**: `test_*.py` для файлов, `test_*` для функций
-3. **Покрытие**: Стремимся к 90%+ покрытию кода
-4. **Типы тестов**:
-   - Unit tests для отдельных функций
-   - Integration tests для взаимодействия компонентов
-   - Property-based tests для математических свойств
-
-### Пример теста
-
-```python
-import pytest
-from balansis.core import AbsoluteValue
-
-class TestAbsoluteValue:
-    """Тесты для класса AbsoluteValue."""
-    
-    def test_creation_positive(self):
-        """Тест создания положительного значения."""
-        av = AbsoluteValue(5.0, True)
-        assert av.magnitude == 5.0
-        assert av.direction is True
-    
-    def test_creation_negative_magnitude_raises(self):
-        """Тест что отрицательная magnitude вызывает ошибку."""
-        with pytest.raises(ValueError, match="Magnitude must be non-negative"):
-            AbsoluteValue(-1.0, True)
-    
-    @pytest.mark.parametrize("magnitude,direction,expected", [
-        (5.0, True, 5.0),
-        (5.0, False, -5.0),
-        (0.0, True, 0.0),
-        (0.0, False, 0.0),
-    ])
-    def test_to_float(self, magnitude, direction, expected):
-        """Параметризованный тест конвертации в float."""
-        av = AbsoluteValue(magnitude, direction)
-        assert av.to_float() == expected
+```bash
+cd formal
+lake build
+lake build BalansisFormal
+lake build ACT
 ```
 
-## 📖 Документация
+## Documentation Expectations
 
-### Типы документации
+- update documentation when behavior changes
+- keep canonical public docs in English
+- avoid creating new shadow documentation outside `docs/`
+- keep research material, archive material, and canonical docs clearly separated
+- do not introduce broken links or placeholder pages in the public docs tree
 
-1. **API Reference**: Автоматически генерируется из docstrings
-2. **Руководства**: Пошаговые инструкции в `docs/guide/`
-3. **Теоретические материалы**: Математические основы в `docs/theory/`
-4. **Примеры**: Jupyter notebooks в `examples/`
+## Workflow
 
-### Написание документации
+Recommended process:
 
-- **Язык**: Русский для основной документации, английский для API
-- **Формат**: Markdown с поддержкой LaTeX для формул
-- **Структура**: Логическая организация от простого к сложному
+1. Open an issue for large changes.
+2. Create a focused branch from `main`.
+3. Keep commits small and reviewable.
+4. Add or update tests when the change affects behavior.
+5. Update relevant docs in the same pull request.
 
-### Математические формулы
+Suggested commit prefixes:
 
-Используйте LaTeX для математических выражений:
+- `feat:`
+- `fix:`
+- `docs:`
+- `test:`
+- `refactor:`
+- `perf:`
+- `ci:`
 
-```markdown
-Операция компенсации определяется как:
+## Pull Request Checklist
 
-$$\text{compensate}(a, b) = |a| \odot |b| \text{ where } \odot \text{ is ACT operation}$$
+- [ ] The change is scoped and described clearly
+- [ ] Tests were added or updated when needed
+- [ ] Documentation was updated when needed
+- [ ] No stale claims were introduced
+- [ ] The contribution is compatible with the dual-license model
+- [ ] Local quality checks pass
 
-Для inline формул: $|a| + |b| = |a \oplus b|$
-```
+## Where Help Is Most Valuable
 
-## 🔄 Процесс Pull Request
+- documentation architecture and API reference quality
+- benchmark methodology and reproducible comparisons
+- formal-verification exposition that bridges Lean and Python
+- practical examples for finance, scientific computing, and simulations
+- cleanup of `tnsim` documentation and status boundaries
 
-### Перед созданием PR
+## Questions
 
-1. **Создайте issue** для обсуждения изменений (для больших изменений)
-2. **Создайте ветку** от `main`:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Сделайте изменения** следуя стандартам кода
-4. **Добавьте тесты** для новой функциональности
-5. **Обновите документацию** если необходимо
-6. **Проверьте лицензионную чистоту**: не копируйте код с несовместимыми лицензиями и не добавляйте сторонние артефакты без явной правовой проверки
+- Open a GitHub issue for bugs or proposals
+- Raise larger design questions before implementing them
+- Use [SECURITY.md](SECURITY.md) for private vulnerability disclosure
 
-### Создание PR
+## Contact
 
-1. **Заголовок**: Краткое описание изменений
-2. **Описание**: Подробное объяснение что и зачем изменено
-3. **Связанные issues**: Укажите номера связанных issues
-4. **Чеклист**: Убедитесь что все пункты выполнены
+Contribution, licensing, and repository questions:
 
-### Шаблон PR
-
-```markdown
-## Описание
-
-Краткое описание изменений и их цель.
-
-## Тип изменений
-
-- [ ] Исправление ошибки (bug fix)
-- [ ] Новая функция (feature)
-- [ ] Критическое изменение (breaking change)
-- [ ] Обновление документации
-
-## Тестирование
-
-- [ ] Тесты проходят локально
-- [ ] Добавлены новые тесты
-- [ ] Покрытие тестами не уменьшилось
-
-## Чеклист
-
-- [ ] Код соответствует стандартам проекта
-- [ ] Добавлены/обновлены docstrings
-- [ ] Обновлена документация
-- [ ] Добавлена запись в CHANGELOG.md
-- [ ] Вклад совместим с dual-license моделью проекта
-```
-
-### Процесс ревью
-
-1. **Автоматические проверки**: CI/CD должны пройти успешно
-2. **Ревью кода**: Минимум один approve от мейнтейнера
-3. **Тестирование**: Проверка функциональности
-4. **Документация**: Проверка актуальности документации
-
-## 🐛 Отчеты об ошибках
-
-### Перед созданием issue
-
-1. **Поиск**: Проверьте существующие issues
-2. **Воспроизведение**: Убедитесь что ошибка воспроизводится
-3. **Минимальный пример**: Создайте минимальный код для воспроизведения
-
-### Шаблон отчета об ошибке
-
-```markdown
-## Описание ошибки
-
-Краткое описание что происходит не так.
-
-## Воспроизведение
-
-Шаги для воспроизведения:
-1. Импортируйте '...'
-2. Создайте объект '...'
-3. Вызовите метод '...'
-4. Наблюдайте ошибку
-
-## Ожидаемое поведение
-
-Что должно происходить.
-
-## Минимальный пример
-
-```python
-from balansis import AbsoluteValue
-
-# Код который вызывает ошибку
-av = AbsoluteValue(5.0)
-result = av.some_method()  # Здесь происходит ошибка
-```
-
-## Окружение
-
-- OS: [e.g. Ubuntu 20.04]
-- Python: [e.g. 3.9.7]
-- Balansis: [e.g. 0.1.0]
-- Другие библиотеки: [e.g. numpy 1.21.0]
-
-## Дополнительная информация
-
-Любая дополнительная информация, скриншоты, логи.
-```
-
-## ✨ Предложения новых функций
-
-### Процесс предложения
-
-1. **Обсуждение**: Создайте issue с меткой "enhancement"
-2. **Дизайн**: Обсудите API и реализацию
-3. **Прототип**: Создайте proof-of-concept если необходимо
-4. **Реализация**: Создайте PR с полной реализацией
-
-### Шаблон предложения функции
-
-```markdown
-## Описание функции
-
-Что вы хотите добавить и зачем это нужно.
-
-## Мотивация
-
-Какую проблему это решает или какую возможность добавляет.
-
-## Предлагаемое API
-
-```python
-# Пример использования новой функции
-from balansis import NewFeature
-
-nf = NewFeature(param1, param2)
-result = nf.new_method()
-```
-
-## Альтернативы
-
-Какие альтернативные решения рассматривались.
-
-## Дополнительная информация
-
-Ссылки на исследования, статьи, другие реализации.
-```
-
-## 🏷 Релизы и версионирование
-
-### Semantic Versioning
-
-Мы используем [SemVer](https://semver.org/):
-
-- **MAJOR** (X.0.0): Несовместимые изменения API
-- **MINOR** (0.X.0): Новая функциональность (обратно совместимая)
-- **PATCH** (0.0.X): Исправления ошибок
-
-### Процесс релиза
-
-1. **Подготовка**: Обновление CHANGELOG.md и версии
-2. **Тестирование**: Полное тестирование на всех поддерживаемых версиях Python
-3. **Документация**: Обновление документации
-4. **Релиз**: Создание тега и публикация на PyPI
-
-### Поддерживаемые версии
-
-- **Текущая стабильная**: Полная поддержка
-- **Предыдущая стабильная**: Исправления критических ошибок
-- **Более старые**: Только критические исправления безопасности
-
-## 🎯 Приоритеты развития
-
-### Высокий приоритет
-- Стабильность и корректность алгоритмов
-- Производительность критических операций
-- Полнота математической модели
-
-### Средний приоритет
-- Удобство использования API
-- Интеграция с популярными библиотеками
-- Расширенная документация
-
-### Низкий приоритет
-- Дополнительные утилиты
-- Экспериментальные функции
-- Оптимизации для специфических случаев
-
-## 📞 Связь с сообществом
-
-- **GitHub Issues**: Основной канал для обсуждений
-- **Discussions**: Общие вопросы и идеи
-- **Email**: [maintainer@balansis.org](mailto:maintainer@balansis.org) для приватных вопросов
-
-## 🙏 Благодарности
-
-Спасибо всем участникам, которые вносят вклад в развитие Balansis! Каждый вклад ценен, будь то код, документация, тестирование или обратная связь.
-
----
-
-**Помните**: Хороший код - это код, который легко читать, понимать и поддерживать. Мы стремимся к высокому качеству во всех аспектах проекта.
+- `andrew@xteam.pro`

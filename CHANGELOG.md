@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reworked repository licensing into a canonical dual-license layout: root `LICENSE` now contains the standard `AGPL-3.0` text, with `LICENSING.md` and `COMMERCIAL_LICENSE.md` documenting the commercial path
 - Added legal support documents: `NOTICE`, `CLA.md`, and contribution guidance aligned with dual licensing
 - Synced README, package metadata, `tnsim` metadata, and release workflow with the active licensing model
-- Corrected outdated formal-verification documentation so theorem names and architecture match the current Lean code
+- Corrected outdated formal documentation so theorem names and architecture match the current Lean code
+- Established a visible documentation architecture under `docs/`, moved legacy and research material out of the main canonical path, and redesigned the README as a value-first navigation hub
 
 ### Planned
 - Balansis v0.7 (next milestone): stable API, complete `linalg/` (GEMM, SVD, QR), PyTorch integration
@@ -64,9 +65,9 @@ and S1–S3 directly.
   - `AbsoluteValue` class with magnitude and direction
   - `EternalRatio` class for stable fraction representation
   - `Compensator` engine for numerical stability
-- Algebraic structures:
-  - `AbsoluteGroup` implementation with group theory verification
-  - `EternityField` implementation with field theory verification
+- Runtime algebra helpers:
+  - `AbsoluteGroup` implementation for structured group-style runtime workflows
+  - `EternityField` implementation for structured field-style runtime workflows
 - Compensated arithmetic operations: `compensated_add`, `compensated_multiply`, `compensated_divide`, `compensated_power`
 - Near-cancellation detection (threshold 1e-15), overflow/underflow protection
 - `sequence_sum` (Kahan-compensated), `sequence_product`
@@ -75,16 +76,16 @@ and S1–S3 directly.
 - Finance module: `finance/ledger.py` (exact cancellation accounting)
 - NumPy integration: `numpy_integration.py` (vectorized ACT ops)
 - Memory: `memory/arena.py` (value pooling)
-- Lean4 formal specs (initial): `formal/ACT/Absolute.lean`, `Eternity.lean`, `Algebra.lean`
+- Initial Lean4 formal layer integration: early `formal/ACT/*` proof modules
 - Comprehensive test suite with ≥95% coverage
 - Example Jupyter notebooks demonstrating core concepts
 - Poetry-based dependency management
 - Type safety with MyPy strict mode
 - Code quality tools: Black, isort, flake8, bandit, codespell, interrogate
 - Theoretical documentation:
-  - `docs/theory/act_whitepaper.md` — formal specification and axiomatics
-  - `docs/theory/algebraic_proofs.md` — algebraic proofs and edge case analysis
-  - `docs/guide/precision_and_stability.md` — precision guide with benchmark comparisons
+  - `docs/research/ACT_WHITEPAPER_v1.md` — retained historical whitepaper and axiomatic research material
+  - `docs/archive/legacy/algebraic_proofs.ru.md` — retained historical algebraic proof notes
+  - `docs/guides/precision-and-stability.md` — canonical guide entry for precision and stability topics
 
 ### Security
 - No known security vulnerabilities in initial release
@@ -100,10 +101,10 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 | API Layer | Stability |
 |-----------|-----------|
 | Core types (`AbsoluteValue`, `EternalRatio`) | Stable — MAJOR version only |
-| Algebraic structures (`AbsoluteGroup`, `EternityField`) | Stable — MAJOR version only |
+| Runtime algebra helpers (`AbsoluteGroup`, `EternityField`) | Stable — MAJOR version only |
 | Compensated operations | Stable — MAJOR version only |
 | Utility functions, integration patterns | Evolving — MINOR version |
-| Lean4 formal specs | Evolving — MINOR version |
+| Lean4 formal layer | Evolving — MINOR version |
 | Private methods, test utilities | No guarantees |
 
 ### Deprecation Policy
