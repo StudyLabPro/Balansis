@@ -10,6 +10,17 @@ This walkthrough corresponds to `examples/02_eternal_ratios_and_compensation.ipy
 - how `EternalRatio` is used in the runtime
 - how compensated operations expose auxiliary information
 - how ratio-oriented behavior differs from plain division workflows
+- where the strict finite `EternalRatio` contract stops and `ExtendedRatio` begins
+
+## M3 Runtime Extension
+
+Balansis now exposes two ratio layers:
+
+- `EternalRatio` for strict finite ratios with explicit denominator guard
+- `ExtendedRatio` for opt-in singular arithmetic with `finite`, `infinite`, and `indeterminate` states
+
+Use the strict layer when invalid division should fail fast. Use the extended
+layer when edge states must remain visible inside a longer-running computation.
 
 ## Recommended Use
 

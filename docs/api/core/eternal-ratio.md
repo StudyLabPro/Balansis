@@ -3,7 +3,7 @@
 **Audience:** developers  
 **Status:** canonical
 
-`EternalRatio` is the structured runtime ratio object in Balansis.
+`EternalRatio` is the strict finite ratio object in Balansis.
 
 ## Purpose
 
@@ -13,6 +13,9 @@ It stores:
 - a denominator `AbsoluteValue`
 
 The denominator cannot be `ABSOLUTE`.
+If your workflow must represent `infinite` or `indeterminate` division states
+as values, use `ExtendedRatio` instead of weakening the `EternalRatio`
+contract.
 
 ## Common Entry Points
 
@@ -32,8 +35,15 @@ ratio = EternalRatio(numerator=num, denominator=den)
 - `is_stable()`
 - `simplify()`
 
+## Contract Boundary
+
+- `EternalRatio` is for finite structured ratios only
+- invalid denominators remain rejected explicitly
+- singular runtime semantics now live in `ExtendedRatio`
+
 ## Related Docs
 
+- [ExtendedRatio API](extended-ratio.md)
 - [ACT Definitions and Notation](../../mathematics/act-definitions.md)
 - [Operations API](operations.md)
 - [Proof Map](../../formal/proof-map.md)

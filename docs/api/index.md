@@ -10,6 +10,7 @@ surface that exists today and avoids placeholder pages.
 
 - [Core: AbsoluteValue](core/absolute-value.md)
 - [Core: EternalRatio](core/eternal-ratio.md)
+- [Core: ExtendedRatio](core/extended-ratio.md)
 - [Core: Operations](core/operations.md)
 - [Algebra Runtime Overview](algebra/overview.md)
 - [Linear Algebra Overview](linalg/overview.md)

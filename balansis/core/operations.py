@@ -15,19 +15,21 @@ are designed around the Absolute Compensation Theory (ACT) principles.
 """
 
 import math
-from typing import Union, List, Tuple
+from typing import List, Optional, Tuple, Union
 from decimal import getcontext
 
 from .absolute import AbsoluteValue
-from .eternity import EternalRatio
+from .eternity import EternalRatio, ExtendedRatio, SingularArithmeticEvent, SingularPolicy
 
 # Set high precision for decimal operations
 getcontext().prec = 50
 
 # Type aliases for clarity
-NumericType = Union[float, int, AbsoluteValue, EternalRatio]
+NumericType = Union[float, int, AbsoluteValue, EternalRatio, ExtendedRatio]
 CompensatedResult = Tuple[AbsoluteValue, float]  # (result, compensation_factor)
 CompensatedDivideResult = Tuple[EternalRatio, float]  # (ratio, compensation_factor)
+ExtendedDivideResult = Tuple[ExtendedRatio, float]  # (extended ratio, compensation_factor)
+PolicyDivideResult = Tuple[ExtendedRatio, float, Optional[SingularArithmeticEvent]]
 
 
 class Operations:
@@ -144,6 +146,56 @@ class Operations:
             applied_compensation = denominator.magnitude / Operations.COMPENSATION_THRESHOLD
 
         return EternalRatio(numerator=numerator, denominator=denominator), applied_compensation
+
+    @staticmethod
+    def compensated_divide_extended(
+        numerator: AbsoluteValue,
+        denominator: AbsoluteValue,
+        compensation_factor: float = 1.0,
+    ) -> ExtendedDivideResult:
+        """Perform compensated division with explicit singular semantics.
+
+        This is the M3 opt-in division contract:
+
+        - finite / finite -> finite `ExtendedRatio`
+        - finite / Absolute -> signed infinity
+        - Absolute / Absolute -> indeterminate
+        """
+        if denominator.is_absolute():
+            singular_compensation = max(
+                compensation_factor,
+                1.0 / Operations.COMPENSATION_THRESHOLD,
+            )
+            return ExtendedRatio.from_division(numerator, denominator), singular_compensation
+
+        applied_compensation = 1.0
+        if denominator.magnitude < Operations.COMPENSATION_THRESHOLD:
+            applied_compensation = denominator.magnitude / Operations.COMPENSATION_THRESHOLD
+
+        finite_ratio = EternalRatio(numerator=numerator, denominator=denominator)
+        return ExtendedRatio.from_ratio(finite_ratio), applied_compensation
+
+    @staticmethod
+    def compensated_divide_policy(
+        numerator: AbsoluteValue,
+        denominator: AbsoluteValue,
+        policy: SingularPolicy | str = SingularPolicy.PROPAGATE,
+        *,
+        compensation_factor: float = 1.0,
+        saturation_limit: float = 1e12,
+    ) -> PolicyDivideResult:
+        """Perform compensated division and resolve singular states via policy."""
+        result, applied_compensation = Operations.compensated_divide_extended(
+            numerator,
+            denominator,
+            compensation_factor=compensation_factor,
+        )
+        resolved, event = result.apply_policy(
+            policy,
+            operation="compensated_divide_policy",
+            saturation_limit=saturation_limit,
+        )
+        return resolved, applied_compensation, event
 
     @staticmethod
     def compensated_power(base: AbsoluteValue, exponent: float,

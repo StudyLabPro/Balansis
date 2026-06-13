@@ -14,7 +14,8 @@ with Absolute and Eternity concepts for enhanced computational stability.
 
 Core Components:
     - AbsoluteValue: Values with magnitude and direction
-    - EternalRatio: Structural ratios between AbsoluteValues
+    - EternalRatio: Structural finite ratios between AbsoluteValues
+    - ExtendedRatio: Ratios with finite / infinite / indeterminate semantics
     - Operations: Compensated arithmetic operations
     - Compensator: Balance and stability calculations
     - AbsoluteGroup: Group theory for Absolute values
@@ -29,7 +30,12 @@ Example:
 """
 
 from balansis.core.absolute import AbsoluteValue
-from balansis.core.eternity import EternalRatio
+from balansis.core.eternity import (
+    EternalRatio,
+    ExtendedRatio,
+    SingularArithmeticEvent,
+    SingularPolicy,
+)
 from balansis.core.operations import Operations
 from balansis.logic.compensator import Compensator
 from balansis.algebra.absolute_group import AbsoluteGroup
@@ -65,6 +71,9 @@ ACT_COMPENSATION_FACTOR = 0.1
 __all__ = [
     "AbsoluteValue",
     "EternalRatio",
+    "ExtendedRatio",
+    "SingularPolicy",
+    "SingularArithmeticEvent",
     "Operations",
     "Compensator",
     "AbsoluteGroup",

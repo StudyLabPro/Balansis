@@ -1,0 +1,150 @@
+{
+  "artifact": "claim_closure_baseline",
+  "version": "0.6.1",
+  "scenarios": [
+    {
+      "scenario": "large_scale_aggregation",
+      "builtin_sum_result": 1.0,
+      "naive_float_result": 0.0,
+      "balansis_result": 1.0,
+      "balansis_compensation": 999999999999999.9,
+      "expected_exact": 1.0,
+      "residual_preserved_vs_naive_float": true,
+      "timing": {
+        "builtin_sum": {
+          "mean_seconds": 1.7035403288900851e-07,
+          "median_seconds": 1.1699739843606949e-07,
+          "min_seconds": 1.1298106983304024e-07,
+          "max_seconds": 5.563982995226979e-06,
+          "iterations": 200
+        },
+        "naive_float_sum": {
+          "mean_seconds": 1.4716904843226074e-07,
+          "median_seconds": 1.3300450518727303e-07,
+          "min_seconds": 1.2299278751015663e-07,
+          "max_seconds": 1.0200019460171461e-06,
+          "iterations": 200
+        },
+        "balansis_sequence_sum": {
+          "mean_seconds": 1.8305855337530375e-06,
+          "median_seconds": 1.6490084817633033e-06,
+          "min_seconds": 1.5620025806128979e-06,
+          "max_seconds": 7.455993909388781e-06,
+          "iterations": 200
+        }
+      }
+    },
+    {
+      "scenario": "cancellation_signal",
+      "float_result": 0.0,
+      "balansis_result": 2.0,
+      "balansis_magnitude": 2.0,
+      "balansis_direction": 1,
+      "balansis_compensation": 5000000000000000.0,
+      "result_is_absolute": false,
+      "timing": {
+        "float_expr": {
+          "mean_seconds": 6.483896868303418e-08,
+          "median_seconds": 6.098707672208548e-08,
+          "min_seconds": 5.5995769798755646e-08,
+          "max_seconds": 3.630120772868395e-07,
+          "iterations": 200
+        },
+        "balansis_compensated_add": {
+          "mean_seconds": 1.2489347136579454e-06,
+          "median_seconds": 1.1855008779093623e-06,
+          "min_seconds": 1.114996848627925e-06,
+          "max_seconds": 5.15900319442153e-06,
+          "iterations": 200
+        }
+      }
+    },
+    {
+      "scenario": "finance_zero_sum",
+      "balance_is_absolute": true,
+      "balance_float": 0.0,
+      "timing": {
+        "ledger_balance": {
+          "mean_seconds": 5.8681902009993795e-06,
+          "median_seconds": 5.736990715377033e-06,
+          "min_seconds": 5.493988282978535e-06,
+          "max_seconds": 1.3112003216519952e-05,
+          "iterations": 200
+        }
+      }
+    },
+    {
+      "scenario": "division_contract",
+      "ratio_value": 3.0,
+      "ratio_signed_value": 1,
+      "compensation": 1.0,
+      "absolute_denominator_error": "Cannot divide by Absolute (denominator magnitude=0)",
+      "timing": {
+        "valid_division": {
+          "mean_seconds": 9.304747800342738e-07,
+          "median_seconds": 9.039940778166056e-07,
+          "min_seconds": 8.689821697771549e-07,
+          "max_seconds": 2.9930088203400373e-06,
+          "iterations": 200
+        }
+      }
+    },
+    {
+      "scenario": "extended_division_states",
+      "finite_kind": "finite",
+      "finite_value": 3.0,
+      "finite_compensation": 1.0,
+      "infinite_kind": "infinite",
+      "infinite_direction": 1,
+      "infinite_compensation": 999999999999999.9,
+      "indeterminate_kind": "indeterminate",
+      "indeterminate_reason": "absolute_over_absolute",
+      "indeterminate_compensation": 999999999999999.9,
+      "timing": {
+        "finite_division_extended": {
+          "mean_seconds": 4.018903855467215e-06,
+          "median_seconds": 3.875495167449117e-06,
+          "min_seconds": 3.6609999369829893e-06,
+          "max_seconds": 7.027003448456526e-06,
+          "iterations": 200
+        },
+        "infinite_division_extended": {
+          "mean_seconds": 3.7321235868148504e-06,
+          "median_seconds": 3.555513103492558e-06,
+          "min_seconds": 3.374996595084667e-06,
+          "max_seconds": 1.0315008694306016e-05,
+          "iterations": 200
+        }
+      }
+    },
+    {
+      "scenario": "policy_driven_singular_arithmetic",
+      "propagate_kind": "infinite",
+      "propagate_event_policy": "propagate",
+      "propagate_compensation": 999999999999999.9,
+      "saturate_kind": "finite",
+      "saturate_value": 100.0,
+      "saturate_event_policy": "saturate",
+      "saturate_compensation": 999999999999999.9,
+      "telemetry_event_policy": "saturate",
+      "telemetry_singular_operations": 1,
+      "telemetry_policy_event_count": 1,
+      "timing": {
+        "propagate_policy_division": {
+          "mean_seconds": 4.4356792932376265e-06,
+          "median_seconds": 4.21851291321218e-06,
+          "min_seconds": 3.944005584344268e-06,
+          "max_seconds": 1.403299393132329e-05,
+          "iterations": 200
+        },
+        "saturate_policy_division": {
+          "mean_seconds": 9.473204700043426e-06,
+          "median_seconds": 8.879491360858083e-06,
+          "min_seconds": 8.333998266607523e-06,
+          "max_seconds": 3.6281009670346975e-05,
+          "iterations": 200
+        }
+      }
+    }
+  ]
+}

@@ -23,7 +23,12 @@ from dataclasses import dataclass
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from ..core.absolute import AbsoluteValue
-from ..core.eternity import EternalRatio
+from ..core.eternity import (
+    EternalRatio,
+    ExtendedRatio,
+    SingularArithmeticEvent,
+    SingularPolicy,
+)
 from ..core.operations import Operations, CompensatedResult
 
 
@@ -54,6 +59,32 @@ class CompensationRecord:
             raise ValueError("Compensation factor must be non-negative")
         if not (0.0 <= self.stability_metric <= 1.0):
             raise ValueError("Stability metric must be between 0 and 1")
+
+    @staticmethod
+    def _serialize_value(value: Any) -> Any:
+        if isinstance(value, SingularArithmeticEvent):
+            return value.model_dump()
+        if hasattr(value, "to_json") and callable(value.to_json):
+            return value.to_json()
+        if isinstance(value, AbsoluteValue):
+            return {
+                "type": "AbsoluteValue",
+                "magnitude": value.magnitude,
+                "direction": value.direction,
+                "float": value.to_float(),
+            }
+        return value
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "operation_type": self.operation_type,
+            "compensation_type": self.compensation_type.value,
+            "original_values": [self._serialize_value(v) for v in self.original_values],
+            "compensated_values": [self._serialize_value(v) for v in self.compensated_values],
+            "compensation_factor": self.compensation_factor,
+            "stability_metric": self.stability_metric,
+            "timestamp": self.timestamp,
+        }
 
 
 class CompensationStrategy(BaseModel):
@@ -487,6 +518,64 @@ class Compensator:
             self.history.append(record)
         
         return result
+
+    def compensate_division_extended(
+        self,
+        numerator: AbsoluteValue,
+        denominator: AbsoluteValue,
+    ) -> ExtendedRatio:
+        """Perform compensated division with explicit infinite/indeterminate states."""
+        self._operation_count += 1
+
+        compensations = self.detect_compensation_need('divide', [numerator, denominator])
+        result, op_compensation = Operations.compensated_divide_extended(numerator, denominator)
+
+        if compensations:
+            record = CompensationRecord(
+                operation_type='division_extended',
+                compensation_type=compensations[0],
+                original_values=[numerator, denominator],
+                compensated_values=[result],
+                compensation_factor=op_compensation,
+                stability_metric=1.0 if result.is_stable() else 0.0,
+                timestamp=self._operation_count
+            )
+            self.history.append(record)
+
+        return result
+
+    def compensate_division_policy(
+        self,
+        numerator: AbsoluteValue,
+        denominator: AbsoluteValue,
+        policy: SingularPolicy | str = SingularPolicy.PROPAGATE,
+        *,
+        saturation_limit: float = 1e12,
+    ) -> tuple[ExtendedRatio, Optional[SingularArithmeticEvent]]:
+        """Perform policy-driven extended division with telemetry output."""
+        self._operation_count += 1
+
+        compensations = self.detect_compensation_need('divide', [numerator, denominator])
+        result, op_compensation, event = Operations.compensated_divide_policy(
+            numerator,
+            denominator,
+            policy,
+            saturation_limit=saturation_limit,
+        )
+
+        if compensations or event is not None:
+            record = CompensationRecord(
+                operation_type='division_policy',
+                compensation_type=compensations[0] if compensations else CompensationType.SINGULARITY,
+                original_values=[numerator, denominator],
+                compensated_values=[result] + ([event] if event is not None else []),
+                compensation_factor=op_compensation,
+                stability_metric=1.0 if result.is_stable() else 0.0,
+                timestamp=self._operation_count
+            )
+            self.history.append(record)
+
+        return result, event
     
     def compensate_power(self, base: AbsoluteValue, exponent: float) -> AbsoluteValue:
         """Perform compensated exponentiation.
@@ -595,6 +684,25 @@ class Compensator:
             'compensation_types': compensation_types,
             'average_stability': total_stability / len(self.history),
             'latest_compensations': list(self.history)[-5:]
+        }
+
+    def get_singular_telemetry(self) -> Dict[str, Any]:
+        """Return serialized telemetry for singular arithmetic handling."""
+        singular_records = [
+            record for record in self.history
+            if record.compensation_type == CompensationType.SINGULARITY
+            or record.operation_type in {"division_extended", "division_policy"}
+        ]
+        policy_events = [
+            value.model_dump()
+            for record in singular_records
+            for value in record.compensated_values
+            if isinstance(value, SingularArithmeticEvent)
+        ]
+        return {
+            'singular_operations': len(singular_records),
+            'policy_events': policy_events,
+            'records': [record.to_dict() for record in singular_records],
         }
     
     def reset_history(self) -> None:

@@ -4,4 +4,6 @@
 import BalansisFormal.Direction
 import BalansisFormal.AbsoluteValue
 import BalansisFormal.EternalRatio
+import BalansisFormal.ExtendedRatio
 import BalansisFormal.Algebra
+import BalansisFormal.Analysis

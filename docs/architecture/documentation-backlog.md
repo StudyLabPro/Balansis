@@ -30,6 +30,15 @@ Stage 1 architecture reset.
 | `docs/formal/verification.md` | valuable content exists, but it overlaps with `docs/formal/overview.md` and needs clearer role separation | keep as deep-dive reference and link it explicitly from overview |
 | `examples/` notebooks | some prose remains legacy-style or mixed-language | normalize reader-facing notebook narration to English as notebooks are revised |
 | `docs/mathematics/index.md` | currently a hub without deep canonical content | expand into real theory navigation pages |
+| `.trae/documents/*` | hidden legacy material still contains strong competing claims and obsolete navigation | keep triage current, add notices, and never treat shadow docs as canonical |
+
+## Governance Follow-Up
+
+| Area | Current need | Target location |
+|---|---|---|
+| Claim enforcement | keep strong public claims registered and evidence-backed | `docs/architecture/claim-registry.md` |
+| Shadow-doc control | prevent `.trae` from reappearing as implicit source of truth | `docs/architecture/shadow-doc-triage.md` |
+| Execution sequencing | maintain the stepwise remediation program for claim closure | `docs/architecture/claims-execution-plan.md` |
 
 ## Completion Rule
 

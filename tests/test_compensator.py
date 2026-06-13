@@ -14,6 +14,7 @@ from balansis.core.operations import Operations
 from balansis.logic.compensator import (
     CompensationType, CompensationRecord, CompensationStrategy, Compensator
 )
+from balansis.core.eternity import SingularPolicy
 from balansis import ACT_EPSILON, ACT_COMPENSATION_FACTOR
 
 
@@ -339,6 +340,41 @@ class TestCompensator:
         assert summary['compensation_rate'] > 0.0
         assert 'compensation_types' in summary
         assert 'average_stability' in summary
+
+    def test_compensate_division_policy_records_event(self):
+        """Test policy-driven division produces telemetry."""
+        numerator = AbsoluteValue(magnitude=5.0, direction=1)
+        denominator = AbsoluteValue.absolute()
+
+        result, event = self.compensator.compensate_division_policy(
+            numerator,
+            denominator,
+            SingularPolicy.PROPAGATE,
+        )
+
+        assert result.is_infinite()
+        assert event is not None
+        assert event.policy == SingularPolicy.PROPAGATE
+        assert self.compensator.history[-1].operation_type == "division_policy"
+
+    def test_get_singular_telemetry(self):
+        """Test serialized singular arithmetic telemetry."""
+        numerator = AbsoluteValue(magnitude=5.0, direction=1)
+        denominator = AbsoluteValue.absolute()
+
+        self.compensator.compensate_division_policy(
+            numerator,
+            denominator,
+            SingularPolicy.SATURATE,
+            saturation_limit=7.0,
+        )
+
+        telemetry = self.compensator.get_singular_telemetry()
+
+        assert telemetry["singular_operations"] >= 1
+        assert telemetry["policy_events"]
+        assert telemetry["records"]
+        assert telemetry["records"][-1]["operation_type"] == "division_policy"
     
     def test_reset_history(self):
         """Test compensation history reset."""

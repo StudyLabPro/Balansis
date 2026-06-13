@@ -15,8 +15,9 @@ providing stable mathematical relationships without traditional division issues.
 """
 
 import math
-from typing import Any, Optional
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from enum import Enum
+from typing import Any, Literal, Optional
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .absolute import AbsoluteValue
 
@@ -588,3 +589,422 @@ class EternalRatio(BaseModel):
             return product.is_unity(tolerance)
         except (ValueError, ZeroDivisionError):
             return False
+
+
+class SingularPolicy(str, Enum):
+    """Execution policy for singular arithmetic states."""
+
+    RAISE = "raise"
+    PROPAGATE = "propagate"
+    SATURATE = "saturate"
+
+
+class SingularArithmeticEvent(BaseModel):
+    """Machine-readable telemetry event for singular arithmetic handling."""
+
+    model_config = ConfigDict(
+        frozen=True,
+        validate_assignment=True,
+        arbitrary_types_allowed=True,
+    )
+
+    operation: str = Field(..., description="Operation that produced or handled the singular state")
+    policy: SingularPolicy = Field(..., description="Applied singular arithmetic policy")
+    input_kind: str = Field(..., description="Original ExtendedRatio kind before policy application")
+    output_kind: str = Field(..., description="Resulting kind after policy application")
+    reason: Optional[str] = Field(default=None, description="Optional explanation of the event")
+    direction: Optional[int] = Field(default=None, description="Direction for infinite states")
+    saturated: bool = Field(default=False, description="Whether the event saturated an infinite state")
+    numeric_value: Optional[float] = Field(default=None, description="Numeric output value when finite or infinite")
+
+
+class ExtendedRatio(BaseModel):
+    """Extended ratio with explicit infinity and indeterminate semantics.
+
+    ``EternalRatio`` remains the strict finite-ratio object. ``ExtendedRatio``
+    is the wider runtime model used when a computation must represent:
+
+    - finite ratios,
+    - signed infinity,
+    - indeterminate results.
+    """
+
+    model_config = ConfigDict(
+        frozen=True,
+        validate_assignment=True,
+        arbitrary_types_allowed=True,
+    )
+
+    kind: Literal["finite", "infinite", "indeterminate"] = Field(
+        ...,
+        description="Semantic state of the ratio",
+    )
+    ratio: Optional[EternalRatio] = Field(
+        default=None,
+        description="Finite ratio payload when kind='finite'",
+    )
+    direction: Optional[int] = Field(
+        default=None,
+        description="Direction of infinity when kind='infinite'",
+    )
+    reason: Optional[str] = Field(
+        default=None,
+        description="Optional explanation for singular or indeterminate states",
+    )
+
+    @field_validator("direction")
+    @classmethod
+    def direction_must_be_valid(cls, value: Optional[int]) -> Optional[int]:
+        if value is None:
+            return value
+        if value not in (-1, 1):
+            raise ValueError("Direction must be exactly +1 or -1")
+        return value
+
+    @model_validator(mode="after")
+    def validate_state(self) -> "ExtendedRatio":
+        if self.kind == "finite":
+            if self.ratio is None:
+                raise ValueError("Finite ExtendedRatio requires a finite ratio payload")
+            if self.direction is not None:
+                raise ValueError("Finite ExtendedRatio cannot carry an infinity direction")
+        elif self.kind == "infinite":
+            if self.ratio is not None:
+                raise ValueError("Infinite ExtendedRatio cannot carry a finite ratio payload")
+            if self.direction is None:
+                raise ValueError("Infinite ExtendedRatio requires a direction")
+        else:
+            if self.ratio is not None:
+                raise ValueError("Indeterminate ExtendedRatio cannot carry a finite ratio payload")
+        return self
+
+    @staticmethod
+    def _coerce(other: Any) -> "ExtendedRatio":
+        if isinstance(other, ExtendedRatio):
+            return other
+        if isinstance(other, EternalRatio):
+            return ExtendedRatio.from_ratio(other)
+        if isinstance(other, (int, float)):
+            if not math.isfinite(other):
+                if math.isnan(other):
+                    return ExtendedRatio.indeterminate("nan_input")
+                return (
+                    ExtendedRatio.positive_infinity("float_inf_input")
+                    if other > 0
+                    else ExtendedRatio.negative_infinity("float_inf_input")
+                )
+            return ExtendedRatio.from_float(float(other))
+        return NotImplemented
+
+    @staticmethod
+    def _sign_of_finite_ratio(ratio: EternalRatio) -> int:
+        value = ratio.numerical_value()
+        if value > 0:
+            return 1
+        if value < 0:
+            return -1
+        raise ValueError("Zero finite ratio does not have a sign")
+
+    @classmethod
+    def from_ratio(cls, ratio: EternalRatio) -> "ExtendedRatio":
+        return cls(kind="finite", ratio=ratio)
+
+    @classmethod
+    def from_float(cls, value: float) -> "ExtendedRatio":
+        if not math.isfinite(value):
+            if math.isnan(value):
+                return cls.indeterminate("nan_input")
+            return cls.positive_infinity("float_inf_input") if value > 0 else cls.negative_infinity(
+                "float_inf_input"
+            )
+        return cls.from_ratio(EternalRatio.from_float(value))
+
+    @classmethod
+    def positive_infinity(cls, reason: Optional[str] = None) -> "ExtendedRatio":
+        return cls(kind="infinite", direction=1, reason=reason or "positive_infinity")
+
+    @classmethod
+    def negative_infinity(cls, reason: Optional[str] = None) -> "ExtendedRatio":
+        return cls(kind="infinite", direction=-1, reason=reason or "negative_infinity")
+
+    @classmethod
+    def indeterminate(cls, reason: Optional[str] = None) -> "ExtendedRatio":
+        return cls(kind="indeterminate", reason=reason or "indeterminate")
+
+    @classmethod
+    def from_division(
+        cls,
+        numerator: AbsoluteValue,
+        denominator: AbsoluteValue,
+        reason: Optional[str] = None,
+    ) -> "ExtendedRatio":
+        if denominator.is_absolute():
+            if numerator.is_absolute():
+                return cls.indeterminate(reason or "absolute_over_absolute")
+            direction = numerator.direction * denominator.direction
+            return cls(kind="infinite", direction=direction, reason=reason or "finite_over_absolute")
+        return cls.from_ratio(EternalRatio(numerator=numerator, denominator=denominator))
+
+    def is_finite(self) -> bool:
+        return self.kind == "finite"
+
+    def is_infinite(self) -> bool:
+        return self.kind == "infinite"
+
+    def is_indeterminate(self) -> bool:
+        return self.kind == "indeterminate"
+
+    def is_singular(self) -> bool:
+        return self.kind in {"infinite", "indeterminate"}
+
+    def is_stable(self, tolerance: float = 1e-10) -> bool:
+        return self.is_finite() and self.ratio is not None and self.ratio.is_stable(tolerance)
+
+    def numerical_value(self) -> float:
+        if self.kind == "finite":
+            assert self.ratio is not None
+            return self.ratio.numerical_value()
+        if self.kind == "infinite":
+            assert self.direction is not None
+            return math.copysign(math.inf, self.direction)
+        return math.nan
+
+    def signed_value(self) -> float:
+        if self.kind == "finite":
+            assert self.ratio is not None
+            return self.ratio.signed_value()
+        if self.kind == "infinite":
+            assert self.direction is not None
+            return float(self.direction)
+        return math.nan
+
+    def finite_ratio(self) -> EternalRatio:
+        if self.ratio is None:
+            raise ValueError(f"ExtendedRatio({self.kind}) does not carry a finite ratio")
+        return self.ratio
+
+    def saturate(self, limit: float = 1e12) -> "ExtendedRatio":
+        """Convert infinite states to finite bounded ratios.
+
+        `indeterminate` remains unchanged because there is no honest finite
+        representative for that state.
+        """
+        if limit <= 0.0 or not math.isfinite(limit):
+            raise ValueError("Saturation limit must be a positive finite number")
+        if self.is_infinite():
+            assert self.direction is not None
+            return ExtendedRatio.from_float(self.direction * limit)
+        return self
+
+    def policy_event(
+        self,
+        operation: str,
+        policy: SingularPolicy | str,
+        result: Optional["ExtendedRatio"] = None,
+    ) -> SingularArithmeticEvent:
+        resolved_policy = SingularPolicy(policy)
+        outcome = result or self
+        numeric_value = outcome.numerical_value()
+        return SingularArithmeticEvent(
+            operation=operation,
+            policy=resolved_policy,
+            input_kind=self.kind,
+            output_kind=outcome.kind,
+            reason=self.reason,
+            direction=outcome.direction,
+            saturated=self.is_infinite() and outcome.is_finite(),
+            numeric_value=None if math.isnan(numeric_value) else numeric_value,
+        )
+
+    def apply_policy(
+        self,
+        policy: SingularPolicy | str = SingularPolicy.PROPAGATE,
+        *,
+        operation: str = "extended_ratio",
+        saturation_limit: float = 1e12,
+    ) -> tuple["ExtendedRatio", Optional[SingularArithmeticEvent]]:
+        resolved_policy = SingularPolicy(policy)
+        if not self.is_singular():
+            return self, None
+
+        if resolved_policy == SingularPolicy.RAISE:
+            raise ValueError(f"{operation} produced singular ExtendedRatio(kind={self.kind}, reason={self.reason})")
+
+        if resolved_policy == SingularPolicy.SATURATE:
+            saturated = self.saturate(limit=saturation_limit)
+            if saturated is self:
+                return self, self.policy_event(operation, resolved_policy)
+            return saturated, self.policy_event(operation, resolved_policy, result=saturated)
+
+        return self, self.policy_event(operation, resolved_policy)
+
+    def inverse(self) -> "ExtendedRatio":
+        if self.kind == "indeterminate":
+            return self
+        if self.kind == "infinite":
+            assert self.direction is not None
+            return ExtendedRatio.from_float(0.0)
+
+        ratio = self.finite_ratio()
+        value = ratio.numerical_value()
+        if value == 0.0:
+            return ExtendedRatio.indeterminate("inverse_of_zero")
+        return ExtendedRatio.from_ratio(ratio.inverse())
+
+    def __neg__(self) -> "ExtendedRatio":
+        if self.kind == "indeterminate":
+            return self
+        if self.kind == "infinite":
+            assert self.direction is not None
+            return ExtendedRatio(kind="infinite", direction=-self.direction, reason=self.reason)
+        ratio = self.finite_ratio()
+        return ExtendedRatio.from_ratio(EternalRatio(numerator=-ratio.numerator, denominator=ratio.denominator))
+
+    def __add__(self, other: Any) -> "ExtendedRatio":
+        other_ratio = self._coerce(other)
+        if other_ratio is NotImplemented:
+            return NotImplemented
+
+        if self.is_indeterminate() or other_ratio.is_indeterminate():
+            return ExtendedRatio.indeterminate("addition_with_indeterminate")
+
+        if self.is_finite() and other_ratio.is_finite():
+            return ExtendedRatio.from_ratio(self.finite_ratio() + other_ratio.finite_ratio())
+
+        if self.is_infinite() and other_ratio.is_infinite():
+            if self.direction == other_ratio.direction:
+                return ExtendedRatio(kind="infinite", direction=self.direction, reason="infinity_plus_same_infinity")
+            return ExtendedRatio.indeterminate("opposite_infinities_addition")
+
+        return self if self.is_infinite() else other_ratio
+
+    def __sub__(self, other: Any) -> "ExtendedRatio":
+        other_ratio = self._coerce(other)
+        if other_ratio is NotImplemented:
+            return NotImplemented
+        return self + (-other_ratio)
+
+    def __mul__(self, other: Any) -> "ExtendedRatio":
+        other_ratio = self._coerce(other)
+        if other_ratio is NotImplemented:
+            return NotImplemented
+
+        if self.is_indeterminate() or other_ratio.is_indeterminate():
+            return ExtendedRatio.indeterminate("multiplication_with_indeterminate")
+
+        if self.is_finite() and other_ratio.is_finite():
+            return ExtendedRatio.from_ratio(self.finite_ratio() * other_ratio.finite_ratio())
+
+        if self.is_infinite() and other_ratio.is_infinite():
+            assert self.direction is not None and other_ratio.direction is not None
+            return ExtendedRatio(kind="infinite", direction=self.direction * other_ratio.direction, reason="infinity_times_infinity")
+
+        finite = self.finite_ratio() if self.is_finite() else other_ratio.finite_ratio()
+        infinite = self if self.is_infinite() else other_ratio
+        finite_value = finite.numerical_value()
+        if finite_value == 0.0:
+            return ExtendedRatio.indeterminate("zero_times_infinity")
+        assert infinite.direction is not None
+        return ExtendedRatio(
+            kind="infinite",
+            direction=self._sign_of_finite_ratio(finite) * infinite.direction,
+            reason="finite_times_infinity",
+        )
+
+    def __truediv__(self, other: Any) -> "ExtendedRatio":
+        other_ratio = self._coerce(other)
+        if other_ratio is NotImplemented:
+            return NotImplemented
+
+        if self.is_indeterminate() or other_ratio.is_indeterminate():
+            return ExtendedRatio.indeterminate("division_with_indeterminate")
+
+        if self.is_finite() and other_ratio.is_finite():
+            divisor = other_ratio.finite_ratio()
+            if divisor.numerical_value() == 0.0:
+                dividend = self.finite_ratio()
+                if dividend.numerical_value() == 0.0:
+                    return ExtendedRatio.indeterminate("zero_over_zero_ratio")
+                return ExtendedRatio.indeterminate("finite_over_zero_ratio")
+            return ExtendedRatio.from_ratio(self.finite_ratio() / divisor)
+
+        if self.is_infinite() and other_ratio.is_infinite():
+            return ExtendedRatio.indeterminate("infinity_over_infinity")
+
+        if self.is_infinite() and other_ratio.is_finite():
+            divisor = other_ratio.finite_ratio()
+            if divisor.numerical_value() == 0.0:
+                return ExtendedRatio.indeterminate("infinity_over_zero_ratio")
+            assert self.direction is not None
+            return ExtendedRatio(
+                kind="infinite",
+                direction=self.direction * self._sign_of_finite_ratio(divisor),
+                reason="infinity_over_finite",
+            )
+
+        finite = self.finite_ratio()
+        if finite.numerical_value() == 0.0:
+            return ExtendedRatio.from_float(0.0)
+        return ExtendedRatio.from_float(0.0)
+
+    def __radd__(self, left: Any) -> "ExtendedRatio":
+        left_ratio = self._coerce(left)
+        if left_ratio is NotImplemented:
+            return NotImplemented
+        return left_ratio + self
+
+    def __rsub__(self, left: Any) -> "ExtendedRatio":
+        left_ratio = self._coerce(left)
+        if left_ratio is NotImplemented:
+            return NotImplemented
+        return left_ratio - self
+
+    def __rmul__(self, left: Any) -> "ExtendedRatio":
+        left_ratio = self._coerce(left)
+        if left_ratio is NotImplemented:
+            return NotImplemented
+        return left_ratio * self
+
+    def __rtruediv__(self, left: Any) -> "ExtendedRatio":
+        left_ratio = self._coerce(left)
+        if left_ratio is NotImplemented:
+            return NotImplemented
+        return left_ratio / self
+
+    def __eq__(self, other: Any) -> bool:
+        coerced = self._coerce(other)
+        if coerced is NotImplemented:
+            return False
+        if self.kind != coerced.kind:
+            return False
+        if self.kind == "finite":
+            return self.finite_ratio() == coerced.finite_ratio()
+        if self.kind == "infinite":
+            return self.direction == coerced.direction
+        return True
+
+    def __repr__(self) -> str:
+        if self.kind == "finite":
+            return f"ExtendedRatio(kind='finite', ratio={self.ratio!r})"
+        if self.kind == "infinite":
+            return f"ExtendedRatio(kind='infinite', direction={self.direction}, reason={self.reason!r})"
+        return f"ExtendedRatio(kind='indeterminate', reason={self.reason!r})"
+
+    def __str__(self) -> str:
+        if self.kind == "finite":
+            return f"ExtendedRatio(finite={self.finite_ratio().numerical_value():.6f})"
+        if self.kind == "infinite":
+            return "ExtendedRatio(+infinity)" if self.direction == 1 else "ExtendedRatio(-infinity)"
+        return "ExtendedRatio(indeterminate)"
+
+    def to_json(self) -> dict[str, Any]:
+        payload: dict[str, Any] = {"type": "ExtendedRatio", "kind": self.kind, "reason": self.reason}
+        if self.kind == "finite":
+            payload["value"] = self.finite_ratio().numerical_value()
+            payload["ratio"] = self.finite_ratio().to_json()
+        elif self.kind == "infinite":
+            payload["direction"] = self.direction
+            payload["value"] = self.numerical_value()
+        else:
+            payload["value"] = None
+        return payload

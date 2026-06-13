@@ -34,7 +34,8 @@ except ImportError:  # pragma: no cover - torch is optional
     torch = None  # type: ignore[assignment]
 
 from balansis.core.absolute import AbsoluteValue
-from balansis.core.eternity import EternalRatio
+from balansis.core.eternity import EternalRatio, ExtendedRatio
+from balansis.core.operations import Operations
 
 
 def _validate_lr(lr: float) -> None:
@@ -67,6 +68,14 @@ def _validate_beta(name: str, value: float) -> None:
         raise ValueError(f"Invalid {name}: {value}")
 
 
+def _extended_division_state(numerator: float, denominator: float) -> ExtendedRatio:
+    ratio, _ = Operations.compensated_divide_extended(
+        AbsoluteValue.from_float(numerator),
+        AbsoluteValue.from_float(denominator),
+    )
+    return ratio
+
+
 class EternalOptimizer:
     """ACT-normalised gradient descent with optional momentum + weight decay.
 
@@ -91,6 +100,7 @@ class EternalOptimizer:
         self.momentum = float(momentum)
         self.weight_decay = float(weight_decay)
         self.state: Dict[int, Dict[str, Any]] = {}
+        self.last_scale_state: Optional[ExtendedRatio] = None
 
     def _get_state(self, key: int) -> Dict[str, Any]:
         state = self.state.get(key)
@@ -98,6 +108,10 @@ class EternalOptimizer:
             state = {"momentum_buffer": None, "step": 0}
             self.state[key] = state
         return state
+
+    def scale_state(self, grad_norm: float) -> ExtendedRatio:
+        """Return the ExtendedRatio state for ``lr / grad_norm``."""
+        return _extended_division_state(self.lr, grad_norm)
 
     def step(self, closure: Optional[Any] = None) -> Optional[Any]:
         loss = closure() if closure is not None else None
@@ -111,6 +125,7 @@ class EternalOptimizer:
                 g = g + self.weight_decay * p.data
 
             grad_norm = float(torch.linalg.norm(g))
+            self.last_scale_state = self.scale_state(grad_norm)
             if grad_norm == 0.0:
                 continue
             # ACT-normalised step size: lr / ||g||
@@ -155,6 +170,7 @@ if torch is not None:
             _validate_weight_decay(weight_decay)
             defaults = {"lr": lr, "momentum": momentum, "weight_decay": weight_decay}
             super().__init__(params, defaults)
+            self.last_scale_state: Optional[ExtendedRatio] = None
 
         def step(self, closure: Optional[Any] = None) -> Optional[Any]:
             loss = closure() if closure is not None else None
@@ -170,6 +186,7 @@ if torch is not None:
                         g = g + weight_decay * p.data
 
                     grad_norm = float(torch.linalg.norm(g))
+                    self.last_scale_state = _extended_division_state(lr, grad_norm)
                     if grad_norm == 0.0:
                         continue
                     num = AbsoluteValue.from_float(lr)
@@ -235,6 +252,7 @@ class AdaptiveEternalOptimizer:
         self.total_steps = int(total_steps)
         self.state: Dict[int, Dict[str, Any]] = {}
         self._global_step = 0
+        self.last_clip_state: Optional[ExtendedRatio] = None
 
     @staticmethod
     def _normalize_param_groups(
@@ -296,12 +314,18 @@ class AdaptiveEternalOptimizer:
             return g
         grad_norm = float(torch.linalg.norm(g))
         if grad_norm <= max_norm:
+            self.last_clip_state = ExtendedRatio.from_float(1.0)
             return g
+        self.last_clip_state = _extended_division_state(max_norm, grad_norm)
         # ACT-normalised rescale: max_norm / grad_norm via EternalRatio
         num = AbsoluteValue.from_float(max_norm)
         den = AbsoluteValue.from_float(grad_norm)
         scale = EternalRatio(numerator=num, denominator=den).numerical_value()
         return scale * g
+
+    def clip_scale_state(self, grad_norm: float) -> ExtendedRatio:
+        """Return the ExtendedRatio state for ``max_grad_norm / grad_norm``."""
+        return _extended_division_state(self.max_grad_norm, grad_norm)
 
     def _get_state(self, key: int) -> Dict[str, Any]:
         state = self.state.get(key)

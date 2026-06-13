@@ -16,7 +16,14 @@ This module contains the fundamental mathematical constructs of Absolute Compens
 """
 
 from .absolute import AbsoluteValue
-from .eternity import EternalRatio
+from .eternity import EternalRatio, ExtendedRatio, SingularArithmeticEvent, SingularPolicy
 from .operations import Operations
 
-__all__ = ["AbsoluteValue", "EternalRatio", "Operations"]
+__all__ = [
+    "AbsoluteValue",
+    "EternalRatio",
+    "ExtendedRatio",
+    "SingularPolicy",
+    "SingularArithmeticEvent",
+    "Operations",
+]

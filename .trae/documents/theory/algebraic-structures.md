@@ -1,3 +1,14 @@
+# Legacy Notice
+
+This file is a non-canonical historical draft.
+
+- Canonical mathematics docs live in `docs/mathematics/`
+- Current proof-facing algebra claims live in `docs/formal/`
+- Runtime helper classes are documented in `docs/api/`
+
+Do not treat the claims in this file as current theorem-level or product-level
+truth without checking them against the canonical docs tree.
+
 # Алгебраические структуры в ACT
 
 ## Обзор
