@@ -1,5 +1,12 @@
 # TNSIM User Guide
 
+> `tnsim` is maintained inside the Balansis repository and follows the same
+> repository-level licensing and security policies.
+>
+> - Licensing: `../LICENSE`, `../LICENSING.md`, `../COMMERCIAL_LICENSE.md`
+> - Security reporting: `../SECURITY.md`
+> - `tnsim` is not currently published as an independent PyPI package
+
 ## Table of Contents
 
 1. [Introduction](#introduction)
@@ -45,26 +52,20 @@ TNSIM (Theory of Null-Sum Infinite Multitudes) is a Python library for working w
 - PyTorch >= 1.9.0 (optional, for neural network integration)
 - Balansis >= 0.6.1 (optional, for high-precision computations)
 
-### Installation via pip
-
-```bash
-pip install tnsim
-```
-
 ### Installation from source
 
 ```bash
-git clone https://github.com/your-repo/tnsim.git
-cd tnsim
+git clone https://github.com/XTeam-Pro/Balansis.git
+cd Balansis
 pip install -e .
 ```
 
 ### Development installation
 
 ```bash
-git clone https://github.com/your-repo/tnsim.git
-cd tnsim
-pip install -e ".[dev]"
+git clone https://github.com/XTeam-Pro/Balansis.git
+cd Balansis
+pip install -e .[dev]
 ```
 
 ### Verification

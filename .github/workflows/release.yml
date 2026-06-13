@@ -29,6 +29,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e ".[all]" && pip install pytest pytest-cov mypy black flake8 isort
 
+    - name: Verify licensing documents
+      run: |
+        test -f LICENSE
+        test -f NOTICE
+        test -f LICENSING.md
+        test -f COMMERCIAL_LICENSE.md
+        test -f CLA.md
+        test -f CONTRIBUTING.md
+        test -f SECURITY.md
+        test -f ORDER_FORM_TEMPLATE.md
+        [ ! -f LICENSE-AGPLv3 ]
+        [ ! -f LICENSE-COMMERCIAL ]
+
     - name: Run full test suite
       run: |
         pytest tests/ -v --cov=balansis --cov-fail-under=90

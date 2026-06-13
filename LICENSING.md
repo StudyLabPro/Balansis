@@ -46,6 +46,16 @@ standard baseline commercial license form. A binding commercial grant requires
 an executed order, invoice, quote acceptance, or other written commercial
 instrument issued or approved by the Licensor.
 
+For operational convenience, the repository also includes
+[ORDER_FORM_TEMPLATE.md](ORDER_FORM_TEMPLATE.md), which can be used as the
+starting template for commercial orders and enterprise deals.
+
+## Security reporting
+
+Security issues should be reported privately according to
+[SECURITY.md](SECURITY.md). Do not disclose suspected vulnerabilities publicly
+before responsible triage.
+
 ## Questions
 
 Commercial licensing, quotes, and enterprise requests:

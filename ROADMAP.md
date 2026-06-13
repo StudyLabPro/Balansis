@@ -13,13 +13,13 @@ Strategic development plan for Balansis and Absolute Compensation Theory (ACT).
 |--------|--------|-------|
 | Core types (`AbsoluteValue`, `EternalRatio`) | Stable | Pydantic frozen=True, 45+ operations |
 | Compensated arithmetic | Stable | `compensated_add/mul/div/power`, near-cancellation detection |
-| Algebraic structures (`AbsoluteGroup`, `EternityField`) | Complete | All 12 axioms verified |
-| Lean4 formal proofs | Complete | 0 sorry, 0 axioms — `formal/BalansisFormal/` |
+| Runtime algebra helpers (`AbsoluteGroup`, `EternityField`) | Present | Python runtime helpers; theorem-level guarantees are tracked in the formal layer |
+| Lean4 formal proofs | Complete | 0 `sorry`, 0 `axiom`, public `ACT` facade + constructive `BalansisFormal` |
 | Linear algebra (`linalg/`) | Alpha | GEMM, SVD, QR implemented; benchmarks needed |
 | ML optimizer (`ml/optimizer.py`) | Alpha | `EternalOptimizer`, `EternalTorchOptimizer`; needs validation |
 | Finance module (`finance/ledger.py`) | Alpha | Exact cancellation accounting |
 | NumPy integration | Present | `numpy_integration.py`, vectorized ops |
-| Benchmarks | Missing | Phase 8 target |
+| Benchmarks | Early docs-ready | methodology and interpretation docs exist; broader published benchmark matrix is still pending |
 | PyPI publication | Not published | Phase 8 target |
 
 ---
@@ -37,14 +37,14 @@ Strategic development plan for Balansis and Absolute Compensation Theory (ACT).
 
 - **Outcome**: metadata, compatibility shims, and documentation are synchronized.
 
-### v0.7.0 — "Research Ready" (Q3–Q4 2026 target)
+### v0.7.0 — "Research Ready" (Q3-Q4 2026 target)
 
 **Goal**: Submit ACT paper to arxiv. Validate PyTorch integration.
 
 - `EternalTorchOptimizer` validated on real training runs (eliminate NaN/Inf in >100k step runs)
 - ACT-MagicBrain integration: replace MagicBrain core arithmetic with ACT compensated operations
-- Formal ACT Specification v1.0: LaTeX document for arxiv submission
-- Proof of group/field axioms from Lean4 formalization → math paper
+- Formal ACT specification package for publication-oriented writing
+- Publication-facing synthesis of the existing Lean4 proof surface
 - Distributed training stability comparison
 
 **Gate criteria**:
@@ -61,6 +61,7 @@ Strategic development plan for Balansis and Absolute Compensation Theory (ACT).
 - SciPy integration (linear system solvers, FFT compensation)
 - Memory arena optimization for large-scale computations
 - Complete `sets/eternal_set.py` for zero-sum infinite sets
+- Public benchmark suite with reproducible published result sets
 
 ### v1.0.0 — "Mature" (Phase 12 target, late 2027)
 
@@ -114,22 +115,29 @@ Strategic development plan for Balansis and Absolute Compensation Theory (ACT).
 
 ```
 balansis/
-├── core/          # AbsoluteValue, EternalRatio (stable)
-├── logic/         # Algebraic structures: AbsoluteGroup, EternityField (stable)
-├── algebra/       # Extended algebraic operations
-├── linalg/        # gemm.py, svd.py, qr.py (alpha -> v0.7.0 target)
-├── ml/            # EternalOptimizer, EternalTorchOptimizer (alpha -> v0.7.0 target)
-├── finance/       # ledger.py (alpha)
-├── sets/          # eternal_set.py (alpha)
-├── numpy_integration.py  # Vectorized ACT ops (present)
-├── memory/        # arena.py (present)
-└── benchmarks/    # (planned v0.7.0)
+├── core/                # AbsoluteValue, EternalRatio, Operations
+├── logic/               # Compensator and higher-level runtime orchestration
+├── algebra/             # Runtime algebra helpers
+├── linalg/              # GEMM, QR, SVD
+├── ml/                  # Optimizer experiments
+├── finance/             # Ledger and finance-oriented helpers
+├── sets/                # Runtime set-oriented helpers
+├── numpy_integration.py # NumPy bridge helpers
+└── memory/              # Arena and memory helpers
 formal/
-└── BalansisFormal/  # Lean4 proofs (complete, 0 sorry)
-    ├── Direction.lean
-    ├── AbsoluteValue.lean
-    ├── EternalRatio.lean
-    └── Algebra.lean
+├── ACT/                  # Public theorem facade
+└── BalansisFormal/       # Constructive proof kernel
+docs/
+├── getting-started/      # Onboarding and quick start
+├── mathematics/          # ACT definitions and algebraic structure
+├── formal/               # Proof overview and proof map
+├── api/                  # Code-backed runtime API reference
+├── benchmarks/           # Methodology and interpretation
+├── research/             # Non-canonical research bridge
+└── archive/legacy/       # Historical non-canonical material
+examples/                 # Runnable notebooks and example assets
+benchmarks/               # Benchmark code and execution entrypoints
+tnsim/                    # Adjacent subproject with its own runtime surface
 ```
 
 ---
@@ -150,12 +158,20 @@ Key integration points:
 | Metric | Current | Target (v0.7.0) | Target (v1.0.0) |
 |--------|---------|-----------------|-----------------|
 | Test coverage | 85%+ (shipped modules) | 90%+ (all modules) | 95%+ (all) |
-| Lean4 axioms proven | 12/12 | + compensated ops proofs | + convergence bounds |
+| Lean4 public theorem groups proved | A1-A5, E1-E4, S1-S3 | + compensated ops proofs | + convergence bounds |
 | PyPI published | No | No | Yes |
 | Benchmarks | None | vs IEEE 754, Kahan | vs MPFR, Decimal |
 
 Pre-commit checks: Black, isort, flake8, mypy (strict), bandit, codespell, interrogate — enforced in CI.
 
 ---
+
+## Documentation Pointers
+
+- Documentation hub: [docs/index.md](docs/index.md)
+- Runtime architecture: [docs/architecture/runtime-architecture.md](docs/architecture/runtime-architecture.md)
+- API reference: [docs/api/index.md](docs/api/index.md)
+- Formal proof map: [docs/formal/proof-map.md](docs/formal/proof-map.md)
+- Research boundary: [docs/research/research-scope.md](docs/research/research-scope.md)
 
 *This roadmap is a living document updated at each phase boundary.*

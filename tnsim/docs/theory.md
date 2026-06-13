@@ -1,5 +1,10 @@
 # Zero-Sum Theory of Infinite Sets (TNSIM)
 
+> Documentation note:
+> this theory document belongs to the Balansis repository. Licensing and
+> commercial-use routing are defined at repository level in `../LICENSING.md`
+> and `../COMMERCIAL_LICENSE.md`.
+
 ## Introduction
 
 The Zero-Sum Theory of Infinite Sets (TNSIM) is a mathematical framework that extends traditional set theory by introducing the concept of compensated infinity. The core idea is that zero is the sum of all infinite sets and their elements through mutual compensation.
