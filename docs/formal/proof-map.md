@@ -10,9 +10,10 @@ and audit it.
 ## Runtime/Formal Boundary
 
 The current proved ratio object is the finite `EternalRatio` model. The newer
-runtime `ExtendedRatio` surface now has a minimal proved Lean classifier for
-division-state transitions, but it does not yet have field-like algebraic
-structure or parity with the finite `EternalRatio` theory.
+runtime `ExtendedRatio` surface now has a proved Lean semantic core for
+division-state transitions, indeterminate propagation, infinity interactions,
+saturation, and policy application. It intentionally does not claim field-like
+algebraic structure or parity with the finite `EternalRatio` theory.
 
 ## Layer Roles
 
@@ -51,13 +52,18 @@ structure or parity with the finite `EternalRatio` theory.
 | `s2_*` multiplicative laws on `AbsoluteValue` | `formal/ACT/Algebra.lean` | `formal/BalansisFormal/Algebra.lean` |
 | `s3_*` field laws on `EternalRatio` | `formal/ACT/Algebra.lean` | `formal/BalansisFormal/Algebra.lean` |
 
-## ExtendedRatio Minimal Proofs
+## ExtendedRatio Semantic Proofs
 
 | Theorem family | Public module | Constructive module |
 |---|---|---|
 | finite classification for non-zero denominator | `formal/ACT/ExtendedRatio.lean` | `formal/BalansisFormal/ExtendedRatio.lean` |
 | indeterminate classification for `0 / 0` | `formal/ACT/ExtendedRatio.lean` | `formal/BalansisFormal/ExtendedRatio.lean` |
 | infinite classification for non-zero over zero | `formal/ACT/ExtendedRatio.lean` | `formal/BalansisFormal/ExtendedRatio.lean` |
+| indeterminate propagation for `add` and `mul` | `formal/ACT/ExtendedRatio.lean` | `formal/BalansisFormal/ExtendedRatio.lean` |
+| opposite infinity addition and same-infinity addition | `formal/ACT/ExtendedRatio.lean` | `formal/BalansisFormal/ExtendedRatio.lean` |
+| zero-times-infinity multiplication | `formal/ACT/ExtendedRatio.lean` | `formal/BalansisFormal/ExtendedRatio.lean` |
+| saturation and policy application laws | `formal/ACT/ExtendedRatio.lean` | `formal/BalansisFormal/ExtendedRatio.lean` |
+| non-field-like singular behavior witness | `formal/ACT/ExtendedRatio.lean` | `formal/BalansisFormal/ExtendedRatio.lean` |
 
 ## Audit Surface
 
@@ -72,6 +78,12 @@ The public smoke audit currently checks at least these representative items:
 - `ACT.EternalRatio.e4_inverse`
 - `ACT.ExtendedRatio.fromDivision_of_den_nonzero`
 - `ACT.ExtendedRatio.indeterminate_iff_zero_zero`
+- `ACT.ExtendedRatio.add_indeterminate_left`
+- `ACT.ExtendedRatio.mul_indeterminate_right`
+- `ACT.ExtendedRatio.add_opposite_infinities_indeterminate`
+- `ACT.ExtendedRatio.saturate_infinite`
+- `ACT.ExtendedRatio.applyPolicy_saturate`
+- `ACT.ExtendedRatio.extendedRatio_not_field_carrier`
 - `ACT.AbsoluteValue.s1_associativity`
 - `ACT.AbsoluteValue.s2_mul_inverse`
 - `ACT.EternalRatio.s3_distributivity`
@@ -95,4 +107,5 @@ lake env lean FormalAudit.lean
 - overview: [Formal Verification Overview](overview.md)
 - deep dive: [verification.md](verification.md)
 - mathematical context: [Algebraic Structure](../mathematics/algebraic-structure.md)
+- ExtendedRatio runtime theorem parity: [ExtendedRatio Runtime Parity](extended-ratio-runtime-parity.md)
 - next formalization target: [ExtendedRatio Formalization Outline](extended-ratio-outline.md)

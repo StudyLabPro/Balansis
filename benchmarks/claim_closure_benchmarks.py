@@ -19,6 +19,7 @@ from balansis import AbsoluteValue, Operations
 from balansis.core.eternity import SingularPolicy
 from balansis.logic.compensator import Compensator
 from balansis.finance.ledger import Ledger
+from balansis.linalg.svd import svd
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -258,6 +259,35 @@ def scenario_policy_driven_singular_arithmetic() -> dict[str, object]:
     }
 
 
+def scenario_pipeline_policy_propagation() -> dict[str, object]:
+    matrix = [
+        [AbsoluteValue.absolute(), AbsoluteValue.absolute()],
+        [AbsoluteValue.absolute(), AbsoluteValue.absolute()],
+    ]
+    propagated = svd(matrix, singular_policy=SingularPolicy.PROPAGATE)
+    saturated = svd(matrix, singular_policy=SingularPolicy.SATURATE, saturation_limit=50.0)
+
+    propagated_telemetry = propagated.singular_telemetry()
+    saturated_telemetry = saturated.singular_telemetry()
+
+    return {
+        "scenario": "pipeline_policy_propagation",
+        "svd_propagate_event_count": len(propagated_telemetry),
+        "svd_propagate_first_policy": propagated_telemetry[0]["policy"] if propagated_telemetry else None,
+        "svd_saturate_event_count": len(saturated_telemetry),
+        "svd_saturate_first_policy": saturated_telemetry[0]["policy"] if saturated_telemetry else None,
+        "svd_reconstruction_error": propagated.reconstruction_error,
+        "timing": {
+            "svd_policy_propagate": asdict(
+                measure(lambda: svd(matrix, singular_policy=SingularPolicy.PROPAGATE))
+            ),
+            "svd_policy_saturate": asdict(
+                measure(lambda: svd(matrix, singular_policy=SingularPolicy.SATURATE, saturation_limit=50.0))
+            ),
+        },
+    }
+
+
 def build_report() -> dict[str, object]:
     scenarios = [
         scenario_large_scale_aggregation(),
@@ -266,6 +296,7 @@ def build_report() -> dict[str, object]:
         scenario_division_contract(),
         scenario_extended_division_states(),
         scenario_policy_driven_singular_arithmetic(),
+        scenario_pipeline_policy_propagation(),
     ]
     return {
         "artifact": "claim_closure_baseline",

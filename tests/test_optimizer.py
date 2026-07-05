@@ -2,6 +2,7 @@
 
 import pytest
 
+from balansis import SingularPolicy
 from balansis.ml.optimizer import EternalOptimizer, AdaptiveEternalOptimizer
 
 try:
@@ -97,6 +98,22 @@ class TestEternalOptimizerCreation:
         state = opt.scale_state(0.0)
         assert state.is_infinite()
         assert state.direction == 1
+
+    def test_scale_policy_state_saturates_zero_norm(self):
+        """Test policy-resolved optimizer scale telemetry."""
+        opt = EternalOptimizer([], lr=2.0, singular_policy=SingularPolicy.SATURATE, saturation_limit=10.0)
+        state, event = opt.scale_policy_state(0.0)
+        assert state.is_finite()
+        assert state.numerical_value() == 10.0
+        assert event is not None
+        assert event.policy == SingularPolicy.SATURATE
+        assert event.saturated
+
+    def test_scale_policy_state_raise_mode(self):
+        """Test fail-fast optimizer scale policy."""
+        opt = EternalOptimizer([], lr=2.0, singular_policy=SingularPolicy.RAISE)
+        with pytest.raises(ValueError, match="compensated_divide_policy produced singular"):
+            opt.scale_policy_state(0.0)
 
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not available")
@@ -294,6 +311,15 @@ class TestAdaptiveEternalOptimizerCreation:
         state = opt.clip_scale_state(0.0)
         assert state.is_infinite()
         assert state.direction == 1
+
+    def test_clip_policy_state_saturates_zero_norm(self):
+        """Test policy-resolved clipping telemetry."""
+        opt = AdaptiveEternalOptimizer([], max_grad_norm=2.0, singular_policy="saturate", saturation_limit=8.0)
+        state, event = opt.clip_policy_state(0.0)
+        assert state.is_finite()
+        assert state.numerical_value() == 8.0
+        assert event is not None
+        assert event.saturated
 
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not available")

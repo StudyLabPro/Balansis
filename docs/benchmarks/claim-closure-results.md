@@ -20,6 +20,7 @@ for public Balansis claims surfaced in `README.md` and the canonical guides.
 - division contract with explicit denominator guard
 - extended division states for `finite`, `infinite`, and `indeterminate` runtime outcomes
 - policy-driven singular arithmetic for `raise`, `propagate`, and `saturate` handling
+- pipeline-level policy propagation through SVD singular-value telemetry
 
 ## Why This Artifact Exists
 
@@ -51,6 +52,7 @@ At minimum, the artifact should show:
 - the extended division path represents `finite / ABSOLUTE` as signed infinity
 - the extended division path represents `ABSOLUTE / ABSOLUTE` as indeterminate
 - the policy-driven path records telemetry events and can saturate infinite states to finite bounds
+- the SVD pipeline records singular-value policy telemetry for zero singular values
 
 ## Update Rule
 

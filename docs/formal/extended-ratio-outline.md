@@ -1,16 +1,18 @@
 # ExtendedRatio Formalization Outline
 
 **Audience:** researchers, contributors  
-**Status:** canonical planning note
+**Status:** canonical formalization status note
 
-This page describes the next formalization target for the runtime `ExtendedRatio`
-surface. It is intentionally not part of the proved theorem map yet.
+This page tracks the formalization target for the runtime `ExtendedRatio`
+surface. The current Lean layer now contains a proved semantic core, while the
+broader algebraic/topological theory remains future work.
 
 ## Current Truth
 
 - the proved Lean ratio object is the finite `EternalRatio` layer
 - the shipped Python runtime now also exposes `ExtendedRatio`
-- `ExtendedRatio` now has a minimal theorem-level Lean classifier for runtime division states
+- `ExtendedRatio` now has a theorem-level Lean classifier for runtime division states
+- `ExtendedRatio` now has proved semantic operation laws for indeterminate propagation, opposite infinities, zero-times-infinity, saturation, and policy application
 - the broader algebraic and topological theory for singular states is still not formalized
 
 ## Why A Separate Formal Track Is Needed
@@ -36,6 +38,9 @@ The first honest Lean target for `ExtendedRatio` was to formalize:
    - finite / zero
    - zero / zero
 4. theorem statements for the deterministic semantic transitions already shipped in Python
+5. total semantic operations for `negate`, `add`, and `mul`
+6. policy application for `raise`, `propagate`, and `saturate`
+7. an explicit witness that `ExtendedRatio` has non-field-like singular behavior
 
 That baseline now exists in:
 
@@ -65,5 +70,6 @@ Those require a separate model decision and proof effort.
 ## Related Docs
 
 - [Proof Map](proof-map.md)
+- [ExtendedRatio Runtime Parity](extended-ratio-runtime-parity.md)
 - [ExtendedRatio API](../api/core/extended-ratio.md)
 - [Claim Closure Baseline Results](../benchmarks/claim-closure-results.md)

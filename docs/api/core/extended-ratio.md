@@ -76,8 +76,9 @@ that can be recorded in telemetry or benchmark artifacts.
 
 - `EternalRatio` remains the canonical finite structured ratio object
 - `ExtendedRatio` is the wider runtime surface for singular states
-- the current Lean theorem layer proves a minimal `ExtendedRatio` division-state classifier
-- the current Lean theorem layer does not yet prove algebraic, metric, or topological laws for singular states
+- the current Lean theorem layer proves `ExtendedRatio` division-state classification
+- the current Lean theorem layer proves semantic operation and policy laws for indeterminate propagation, infinity interactions, saturation, and policy application
+- the current Lean theorem layer does not yet prove metric or topological laws for singular states
 
 ## Related Docs
 
@@ -85,3 +86,4 @@ that can be recorded in telemetry or benchmark artifacts.
 - [Operations API](operations.md)
 - [Claim Closure Baseline Results](../../benchmarks/claim-closure-results.md)
 - [Proof Map](../../formal/proof-map.md)
+- [ExtendedRatio Runtime Parity](../../formal/extended-ratio-runtime-parity.md)
