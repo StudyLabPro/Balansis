@@ -3,9 +3,9 @@
 import pytest
 import numpy as np
 
+from balansis import ACT_EPSILON, SingularPolicy
 from balansis.core.absolute import AbsoluteValue
 from balansis.linalg.svd import svd, CompensatedSVDResult
-from balansis import ACT_EPSILON
 
 
 def _make_matrix(arr):
@@ -200,6 +200,34 @@ class TestSVDSpecialCases:
         assert S[0] > 1.0
         assert S[1] < 1e-8
         assert S[2] < 1e-8
+
+    def test_rank_deficient_svd_records_singular_telemetry(self):
+        """Rank-deficient matrices expose singular-value policy telemetry."""
+        A = np.array([
+            [1.0, 2.0, 3.0],
+            [2.0, 4.0, 6.0],
+            [3.0, 6.0, 9.0],
+        ])
+        result = svd(_make_matrix(A))
+        telemetry = result.singular_telemetry()
+        assert telemetry
+        assert telemetry[0]["policy"] == "propagate"
+        assert telemetry[0]["input_kind"] == "infinite"
+
+    def test_rank_deficient_svd_raise_policy_fails_fast(self):
+        """SVD can fail fast when singular values hit zero under raise policy."""
+        A = np.zeros((2, 2))
+        with pytest.raises(ValueError, match="compensated_divide_policy produced singular"):
+            svd(_make_matrix(A), singular_policy=SingularPolicy.RAISE)
+
+    def test_rank_deficient_svd_saturate_policy_bounds_events(self):
+        """SVD can record saturated singular-value handling."""
+        A = np.zeros((2, 2))
+        result = svd(_make_matrix(A), singular_policy="saturate", saturation_limit=12.0)
+        telemetry = result.singular_telemetry()
+        assert telemetry
+        assert telemetry[0]["policy"] == "saturate"
+        assert telemetry[0]["saturated"] is False
 
     def test_zero_row(self):
         """SVD of a matrix with a zero row."""

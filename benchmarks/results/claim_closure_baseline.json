@@ -1,0 +1,174 @@
+{
+  "artifact": "claim_closure_baseline",
+  "version": "1.0.0",
+  "scenarios": [
+    {
+      "scenario": "large_scale_aggregation",
+      "builtin_sum_result": 1.0,
+      "naive_float_result": 0.0,
+      "balansis_result": 1.0,
+      "balansis_compensation": 999999999999999.9,
+      "expected_exact": 1.0,
+      "residual_preserved_vs_naive_float": true,
+      "timing": {
+        "builtin_sum": {
+          "mean_seconds": 1.5944431652314961e-07,
+          "median_seconds": 1.1900556273758411e-07,
+          "min_seconds": 1.1199153959751129e-07,
+          "max_seconds": 3.2469979487359524e-06,
+          "iterations": 200
+        },
+        "naive_float_sum": {
+          "mean_seconds": 1.462151703890413e-07,
+          "median_seconds": 1.3300450518727303e-07,
+          "min_seconds": 1.1999509297311306e-07,
+          "max_seconds": 8.950009942054749e-07,
+          "iterations": 200
+        },
+        "balansis_sequence_sum": {
+          "mean_seconds": 1.8889797502197325e-06,
+          "median_seconds": 1.7040001694113016e-06,
+          "min_seconds": 1.5629921108484268e-06,
+          "max_seconds": 7.661001291126013e-06,
+          "iterations": 200
+        }
+      }
+    },
+    {
+      "scenario": "cancellation_signal",
+      "float_result": 0.0,
+      "balansis_result": 2.0,
+      "balansis_magnitude": 2.0,
+      "balansis_direction": 1,
+      "balansis_compensation": 5000000000000000.0,
+      "result_is_absolute": false,
+      "timing": {
+        "float_expr": {
+          "mean_seconds": 6.586094968952239e-08,
+          "median_seconds": 6.00120984017849e-08,
+          "min_seconds": 5.602487362921238e-08,
+          "max_seconds": 4.2401370592415333e-07,
+          "iterations": 200
+        },
+        "balansis_compensated_add": {
+          "mean_seconds": 1.2701746891252697e-06,
+          "median_seconds": 1.184496795758605e-06,
+          "min_seconds": 1.1119991540908813e-06,
+          "max_seconds": 1.221999991685152e-05,
+          "iterations": 200
+        }
+      }
+    },
+    {
+      "scenario": "finance_zero_sum",
+      "balance_is_absolute": true,
+      "balance_float": 0.0,
+      "timing": {
+        "ledger_balance": {
+          "mean_seconds": 5.897394730709493e-06,
+          "median_seconds": 5.745503585785627e-06,
+          "min_seconds": 5.511014023795724e-06,
+          "max_seconds": 1.2952019460499287e-05,
+          "iterations": 200
+        }
+      }
+    },
+    {
+      "scenario": "division_contract",
+      "ratio_value": 3.0,
+      "ratio_signed_value": 1,
+      "compensation": 1.0,
+      "absolute_denominator_error": "Cannot divide by Absolute (denominator magnitude=0)",
+      "timing": {
+        "valid_division": {
+          "mean_seconds": 9.518848673906177e-07,
+          "median_seconds": 9.290233720093966e-07,
+          "min_seconds": 8.720089681446552e-07,
+          "max_seconds": 2.540997229516506e-06,
+          "iterations": 200
+        }
+      }
+    },
+    {
+      "scenario": "extended_division_states",
+      "finite_kind": "finite",
+      "finite_value": 3.0,
+      "finite_compensation": 1.0,
+      "infinite_kind": "infinite",
+      "infinite_direction": 1,
+      "infinite_compensation": 999999999999999.9,
+      "indeterminate_kind": "indeterminate",
+      "indeterminate_reason": "absolute_over_absolute",
+      "indeterminate_compensation": 999999999999999.9,
+      "timing": {
+        "finite_division_extended": {
+          "mean_seconds": 4.04561054892838e-06,
+          "median_seconds": 3.872497472912073e-06,
+          "min_seconds": 3.649009158834815e-06,
+          "max_seconds": 1.101702218875289e-05,
+          "iterations": 200
+        },
+        "infinite_division_extended": {
+          "mean_seconds": 3.794075455516577e-06,
+          "median_seconds": 3.6014971556141973e-06,
+          "min_seconds": 3.421999281272292e-06,
+          "max_seconds": 1.0615010978654027e-05,
+          "iterations": 200
+        }
+      }
+    },
+    {
+      "scenario": "policy_driven_singular_arithmetic",
+      "propagate_kind": "infinite",
+      "propagate_event_policy": "propagate",
+      "propagate_compensation": 999999999999999.9,
+      "saturate_kind": "finite",
+      "saturate_value": 100.0,
+      "saturate_event_policy": "saturate",
+      "saturate_compensation": 999999999999999.9,
+      "telemetry_event_policy": "saturate",
+      "telemetry_singular_operations": 1,
+      "telemetry_policy_event_count": 1,
+      "timing": {
+        "propagate_policy_division": {
+          "mean_seconds": 4.464455996640027e-06,
+          "median_seconds": 4.195491783320904e-06,
+          "min_seconds": 3.891007509082556e-06,
+          "max_seconds": 1.5258992789313197e-05,
+          "iterations": 200
+        },
+        "saturate_policy_division": {
+          "mean_seconds": 9.182170615531504e-06,
+          "median_seconds": 8.934002835303545e-06,
+          "min_seconds": 8.28501651994884e-06,
+          "max_seconds": 1.643699943087995e-05,
+          "iterations": 200
+        }
+      }
+    },
+    {
+      "scenario": "pipeline_policy_propagation",
+      "svd_propagate_event_count": 2,
+      "svd_propagate_first_policy": "propagate",
+      "svd_saturate_event_count": 2,
+      "svd_saturate_first_policy": "saturate",
+      "svd_reconstruction_error": 0.0,
+      "timing": {
+        "svd_policy_propagate": {
+          "mean_seconds": 4.607952520018443e-05,
+          "median_seconds": 4.38739953096956e-05,
+          "min_seconds": 4.107499262318015e-05,
+          "max_seconds": 0.00020692500402219594,
+          "iterations": 200
+        },
+        "svd_policy_saturate": {
+          "mean_seconds": 4.663120969780721e-05,
+          "median_seconds": 4.477500624489039e-05,
+          "min_seconds": 4.214799264445901e-05,
+          "max_seconds": 7.002500933595002e-05,
+          "iterations": 200
+        }
+      }
+    }
+  ]
+}

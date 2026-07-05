@@ -9,7 +9,7 @@ Balansis documentation is organized by audience and by task:
 - **Decision makers:** start with [Why Balansis](getting-started/why-balansis.md)
 - **Developers:** start with [Quick Start](getting-started/quickstart.md) and [API Reference](api/index.md)
 - **Researchers:** start with [Mathematics](mathematics/index.md) and [Formal Verification](formal/overview.md)
-- **Contributors:** start with [Contributing](../CONTRIBUTING.md), [Documentation Standards](standards.md), and [Contributor Docs](contributor/development-setup.md)
+- **Contributors:** start with [Contributing](../CONTRIBUTING.md), [Release Process](release.md), [Documentation Standards](standards.md), and [Contributor Docs](contributor/development-setup.md)
 
 ## Sections
 
@@ -31,6 +31,9 @@ Balansis documentation is organized by audience and by task:
 
 - [Glossary](glossary.md): canonical terminology and naming boundaries
 - [Documentation Standards](standards.md): file, language, linking, and governance rules
+- [Claims Execution Plan](architecture/claims-execution-plan.md): repository-wide remediation sequence for making documentation claims true
+- [Claim Registry](architecture/claim-registry.md): tracked inventory of strong public claims and their evidence state
+- [Shadow Document Triage](architecture/shadow-doc-triage.md): classification of hidden `.trae` materials and migration rules
 - [Documentation Backlog](architecture/documentation-backlog.md): prioritized missing-document plan
 - [Reading Paths](concepts/reading-paths.md): audience-specific routes through the docs tree
 

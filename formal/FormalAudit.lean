@@ -17,12 +17,58 @@ open ACT
 #check ACT.EternalRatio.e3_multiplicative_identity_left
 #check ACT.EternalRatio.e4_inverse
 
+#check ACT.ExtendedRatio.fromDivision_of_den_nonzero
+#check ACT.ExtendedRatio.fromDivision_zero_zero
+#check ACT.ExtendedRatio.fromDivision_of_num_nonzero_den_zero
+#check ACT.ExtendedRatio.finite_iff_den_nonzero
+#check ACT.ExtendedRatio.indeterminate_iff_zero_zero
+#check ACT.ExtendedRatio.add_indeterminate_left
+#check ACT.ExtendedRatio.add_indeterminate_right
+#check ACT.ExtendedRatio.mul_indeterminate_left
+#check ACT.ExtendedRatio.mul_indeterminate_right
+#check ACT.ExtendedRatio.add_opposite_infinities_indeterminate
+#check ACT.ExtendedRatio.add_same_infinities
+#check ACT.ExtendedRatio.mul_finite_zero_infinite_indeterminate
+#check ACT.ExtendedRatio.mul_infinite_finite_zero_indeterminate
+#check ACT.ExtendedRatio.saturate_infinite
+#check ACT.ExtendedRatio.applyPolicy_raise_infinite
+#check ACT.ExtendedRatio.applyPolicy_raise_indeterminate
+#check ACT.ExtendedRatio.applyPolicy_propagate
+#check ACT.ExtendedRatio.applyPolicy_saturate
+#check ACT.ExtendedRatio.extendedRatio_not_field_carrier
+
 #check ACT.AbsoluteValue.s1_associativity
 #check ACT.AbsoluteValue.s2_mul_inverse
 #check ACT.EternalRatio.s3_distributivity
 
+#check ACT.AbsoluteValue.order_reflexive
+#check ACT.AbsoluteValue.order_antisymmetric
+#check ACT.AbsoluteValue.order_transitive
+#check ACT.AbsoluteValue.metric_nonneg
+#check ACT.AbsoluteValue.metric_symmetry
+#check ACT.AbsoluteValue.metric_triangle
+#check ACT.AbsoluteValue.complete
+#check ACT.AbsoluteValue.continuous_add
+#check ACT.AbsoluteValue.continuous_mul
+
+#check ACT.EternalRatio.order_reflexive
+#check ACT.EternalRatio.order_antisymmetric
+#check ACT.EternalRatio.order_transitive
+#check ACT.EternalRatio.metric_nonneg
+#check ACT.EternalRatio.metric_symmetry
+#check ACT.EternalRatio.metric_triangle
+#check ACT.EternalRatio.complete
+#check ACT.EternalRatio.continuous_add
+#check ACT.EternalRatio.continuous_mul
+
 #check (inferInstance : Field ACT.AbsoluteValue)
 #check (inferInstance : Field ACT.EternalRatio)
+#check (inferInstance : LinearOrder ACT.AbsoluteValue)
+#check (inferInstance : LinearOrder ACT.EternalRatio)
+#check (inferInstance : MetricSpace ACT.AbsoluteValue)
+#check (inferInstance : MetricSpace ACT.EternalRatio)
+#check (inferInstance : CompleteSpace ACT.AbsoluteValue)
+#check (inferInstance : CompleteSpace ACT.EternalRatio)
 
 noncomputable def eternalRatioFieldWitness : Field ACT.EternalRatio :=
   ACT.EternalRatio.eternal_ratio_field

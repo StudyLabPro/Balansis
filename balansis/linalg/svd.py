@@ -18,11 +18,13 @@ diagnostic envelope and the AbsoluteValue lifting.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Iterator, List, Tuple, Union
+from typing import Iterator, List, Optional, Tuple, Union
 
 import numpy as np
 
 from balansis.core.absolute import AbsoluteValue
+from balansis.core.eternity import SingularArithmeticEvent, SingularPolicy
+from balansis.core.operations import Operations
 
 Matrix = List[List[AbsoluteValue]]
 Vector = List[AbsoluteValue]
@@ -47,6 +49,11 @@ class CompensatedSVDResult:
     reconstruction_error: float
     method: str
     compensation_factors: List[float] = field(default_factory=list)
+    singular_events: List[SingularArithmeticEvent] = field(default_factory=list)
+
+    def singular_telemetry(self) -> List[dict[str, object]]:
+        """Return machine-readable singular arithmetic telemetry for this decomposition."""
+        return [event.model_dump(mode="json") for event in self.singular_events]
 
     def __iter__(self) -> Iterator[Union[Matrix, Vector]]:
         # Backwards-compatible tuple unpacking: U, S, Vt = svd(A)
@@ -64,7 +71,12 @@ def _from_numpy(arr: np.ndarray) -> Matrix:
             for i in range(arr.shape[0])]
 
 
-def svd(a: Matrix, method: str = "numpy_gesdd") -> CompensatedSVDResult:
+def svd(
+    a: Matrix,
+    method: str = "numpy_gesdd",
+    singular_policy: SingularPolicy | str = SingularPolicy.PROPAGATE,
+    saturation_limit: float = 1e12,
+) -> CompensatedSVDResult:
     """ACT-compensated SVD.
 
     Args:
@@ -92,11 +104,24 @@ def svd(a: Matrix, method: str = "numpy_gesdd") -> CompensatedSVDResult:
     # singular value, in log10 scale (small singular values get higher comp).
     leading = float(S_np[0]) if S_np.size > 0 else 1.0
     compensations: List[float] = []
+    singular_events: List[SingularArithmeticEvent] = []
+    resolved_policy = SingularPolicy(singular_policy)
+    leading_abs = AbsoluteValue.from_float(leading)
     for s in S_np:
-        if leading == 0.0 or s == 0.0:
+        s_float = float(s)
+        if leading == 0.0 or s_float == 0.0:
             compensations.append(1.0)
         else:
-            compensations.append(1.0 + max(0.0, np.log10(leading / max(float(s), 1e-300))))
+            compensations.append(1.0 + max(0.0, np.log10(leading / max(s_float, 1e-300))))
+
+        _, _, event = Operations.compensated_divide_policy(
+            leading_abs,
+            AbsoluteValue.from_float(s_float),
+            policy=resolved_policy,
+            saturation_limit=saturation_limit,
+        )
+        if event is not None:
+            singular_events.append(event)
 
     # Reconstruction error in original float space
     recon = U_np @ np.diag(S_np) @ Vt_np
@@ -109,4 +134,5 @@ def svd(a: Matrix, method: str = "numpy_gesdd") -> CompensatedSVDResult:
         reconstruction_error=reconstruction_error,
         method=method.lower(),
         compensation_factors=compensations,
+        singular_events=singular_events,
     )

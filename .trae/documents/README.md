@@ -1,118 +1,38 @@
-# Balansis Project Documentation
+# Legacy Notice For `.trae/documents`
 
-## Обзор проекта
+**Status:** archived internal working material  
+**Authority:** non-canonical  
+**Do not use this directory as a public source of truth.**
 
-Balansis - это революционная математическая экосистема, реализующая Теорию Абсолютной Компенсации (ACT) для решения фундаментальных проблем численной нестабильности в вычислениях. Проект включает в себя основную библиотеку, расширенные модули и инновационные приложения в области машинного обучения.
+This `.trae/documents/` tree contains historical drafts, exploratory notes, and
+older architecture or theory writeups created during earlier repository stages.
 
-## Структура документации
+## Canonical Documentation
 
-### 📚 Основная документация
+Use these locations instead:
 
-1. **[Техническая архитектура](./technical_architecture.md)**
-   - Архитектура основной библиотеки Balansis
-   - API определения и структуры данных
-   - Математические операции и алгоритмы
+- public documentation hub: `docs/index.md`
+- architecture cluster: `docs/architecture/`
+- mathematics docs: `docs/mathematics/`
+- formal verification docs: `docs/formal/`
+- contributor rules: `docs/standards.md`
 
-2. **[Требования к продукту](./product_requirements.md)**
-   - Обзор продукта и ключевые функции
-   - Пользовательские роли и процессы
-   - Дизайн интерфейса и UX
+## How To Read This Directory
 
-### 🧮 Теоретические основы
+- treat files here as legacy working material
+- do not cite these files as the current Balansis contract
+- do not restore wording from this directory into canonical docs without
+  validating it against code, proofs, tests, or benchmarks
 
-3. **[Теория нулевых сумм бесконечных множеств (ZSIST)](./zero_sum_infinite_sets_theory.md)**
-   - Математические принципы ZSIST
-   - Связь с теорией ACT
-   - Практические применения
+## Allowed Use
 
-### 🤖 Проекты машинного обучения
+Files in this directory may still be useful as:
 
-4. **[BalansisLLM Project](./balansis_llm_project.md)**
-   - Обзор проекта языковой модели с ACT стабилизацией
-   - Ключевые компоненты и архитектура
-   - Практические применения
+- migration sources for canonical English docs
+- historical context for past terminology
+- research notes that are not yet part of the shipped product truth
 
-5. **[BalansisLLM Technical Architecture](./balansis_llm_technical_architecture.md)**
-   - Детальная техническая архитектура
-   - API определения и маршруты
-   - Модель данных и развертывание
+## Governance Rule
 
-### 🔧 Специализированные модули
-
-6. **[TNSIM Technical Architecture](./tnsim_technical_architecture.md)**
-   - Архитектура модуля TNSIM
-   - Интеграция с основной библиотекой
-   - API для работы с бесконечными множествами
-
-## Быстрая навигация
-
-### По компонентам проекта
-
-| Компонент | Документация | Описание |
-|-----------|--------------|----------|
-| **Balansis Core** | [Technical Architecture](./technical_architecture.md) | Основная библиотека с ACT |
-| **TNSIM** | [TNSIM Architecture](./tnsim_technical_architecture.md) | Модуль для работы с бесконечными множествами |
-| **BalansisLLM** | [LLM Project](./balansis_llm_project.md), [LLM Architecture](./balansis_llm_technical_architecture.md) | Языковая модель с ACT стабилизацией |
-
-### По типу информации
-
-| Тип | Документы | Назначение |
-|-----|-----------|------------|
-| **Архитектура** | Technical Architecture, LLM Architecture, TNSIM Architecture | Техническая реализация |
-| **Теория** | ZSIST Theory, Product Requirements | Математические основы |
-| **Продукт** | Product Requirements, LLM Project | Функциональные требования |
-
-## Ключевые концепции
-
-### Теория Абсолютной Компенсации (ACT)
-- **AbsoluteValue**: Замена традиционного нуля
-- **EternalRatio**: Структурные отношения
-- **Compensator**: Механизм балансировки
-
-### Математические инновации
-- Компенсированная арифметика
-- Стабильные операции с бесконечностями
-- Численная стабильность в ML
-
-### Практические применения
-- Стабилизация нейронных сетей
-- Высокоточные вычисления
-- Квантовая механика и космология
-
-## Статус документации
-
-| Документ | Статус | Последнее обновление |
-|----------|--------|---------------------|
-| Technical Architecture | ✅ Актуален | Полная архитектура |
-| Product Requirements | ✅ Актуален | Требования определены |
-| ZSIST Theory | ✅ Актуален | Теория описана |
-| BalansisLLM Project | ✅ Актуален | Проект описан |
-| BalansisLLM Architecture | ✅ Актуален | Архитектура детализирована |
-| TNSIM Architecture | ✅ Актуален | Модуль документирован |
-
-## Для разработчиков
-
-### Начало работы
-1. Изучите [Product Requirements](./product_requirements.md) для понимания целей
-2. Ознакомьтесь с [Technical Architecture](./technical_architecture.md) для технических деталей
-3. Изучите [ZSIST Theory](./zero_sum_infinite_sets_theory.md) для математических основ
-
-### Расширение функциональности
-- Следуйте принципам ACT при добавлении новых операций
-- Обеспечивайте покрытие тестами ≥95%
-- Документируйте все изменения в соответствующих файлах
-
-### Интеграция с ML
-- См. [BalansisLLM Project](./balansis_llm_project.md) для примеров
-- Используйте TNSIM для работы с бесконечными множествами
-- Применяйте компенсированные операции для численной стабильности
-
-## Контакты и поддержка
-
-- **GitHub**: [AndrewHakmi/Balansis](https://github.com/AndrewHakmi/Balansis/tree/trae-test)
-- **Документация**: Актуальная версия в `.trae/documents/`
-- **Вопросы**: Создавайте Issues в GitHub репозитории
-
----
-
-*Документация обновлена для соответствия текущему состоянию проекта Balansis*
+If a statement appears here and conflicts with `docs/` or root governance files,
+the canonical `docs/` tree wins.

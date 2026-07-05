@@ -34,7 +34,13 @@ except ImportError:  # pragma: no cover - torch is optional
     torch = None  # type: ignore[assignment]
 
 from balansis.core.absolute import AbsoluteValue
-from balansis.core.eternity import EternalRatio
+from balansis.core.eternity import (
+    EternalRatio,
+    ExtendedRatio,
+    SingularArithmeticEvent,
+    SingularPolicy,
+)
+from balansis.core.operations import Operations
 
 
 def _validate_lr(lr: float) -> None:
@@ -67,6 +73,29 @@ def _validate_beta(name: str, value: float) -> None:
         raise ValueError(f"Invalid {name}: {value}")
 
 
+def _extended_division_state(numerator: float, denominator: float) -> ExtendedRatio:
+    ratio, _ = Operations.compensated_divide_extended(
+        AbsoluteValue.from_float(numerator),
+        AbsoluteValue.from_float(denominator),
+    )
+    return ratio
+
+
+def _extended_division_policy(
+    numerator: float,
+    denominator: float,
+    policy: SingularPolicy | str,
+    saturation_limit: float,
+) -> tuple[ExtendedRatio, Optional[SingularArithmeticEvent]]:
+    ratio, _, event = Operations.compensated_divide_policy(
+        AbsoluteValue.from_float(numerator),
+        AbsoluteValue.from_float(denominator),
+        policy=policy,
+        saturation_limit=saturation_limit,
+    )
+    return ratio, event
+
+
 class EternalOptimizer:
     """ACT-normalised gradient descent with optional momentum + weight decay.
 
@@ -81,6 +110,8 @@ class EternalOptimizer:
         lr: float = 1e-3,
         momentum: float = 0.0,
         weight_decay: float = 0.0,
+        singular_policy: SingularPolicy | str = SingularPolicy.PROPAGATE,
+        saturation_limit: float = 1e12,
     ) -> None:
         _validate_lr(lr)
         _validate_momentum(momentum)
@@ -90,7 +121,11 @@ class EternalOptimizer:
         self.lr = float(lr)
         self.momentum = float(momentum)
         self.weight_decay = float(weight_decay)
+        self.singular_policy = SingularPolicy(singular_policy)
+        self.saturation_limit = float(saturation_limit)
         self.state: Dict[int, Dict[str, Any]] = {}
+        self.last_scale_state: Optional[ExtendedRatio] = None
+        self.last_scale_event: Optional[SingularArithmeticEvent] = None
 
     def _get_state(self, key: int) -> Dict[str, Any]:
         state = self.state.get(key)
@@ -98,6 +133,23 @@ class EternalOptimizer:
             state = {"momentum_buffer": None, "step": 0}
             self.state[key] = state
         return state
+
+    def scale_state(self, grad_norm: float) -> ExtendedRatio:
+        """Return the ExtendedRatio state for ``lr / grad_norm``."""
+        return _extended_division_state(self.lr, grad_norm)
+
+    def scale_policy_state(
+        self,
+        grad_norm: float,
+        policy: SingularPolicy | str | None = None,
+    ) -> tuple[ExtendedRatio, Optional[SingularArithmeticEvent]]:
+        """Return policy-resolved scale state and optional singular event."""
+        return _extended_division_policy(
+            self.lr,
+            grad_norm,
+            policy or self.singular_policy,
+            self.saturation_limit,
+        )
 
     def step(self, closure: Optional[Any] = None) -> Optional[Any]:
         loss = closure() if closure is not None else None
@@ -111,6 +163,7 @@ class EternalOptimizer:
                 g = g + self.weight_decay * p.data
 
             grad_norm = float(torch.linalg.norm(g))
+            self.last_scale_state, self.last_scale_event = self.scale_policy_state(grad_norm)
             if grad_norm == 0.0:
                 continue
             # ACT-normalised step size: lr / ||g||
@@ -149,12 +202,18 @@ if torch is not None:
             lr: float = 1e-3,
             momentum: float = 0.0,
             weight_decay: float = 0.0,
+            singular_policy: SingularPolicy | str = SingularPolicy.PROPAGATE,
+            saturation_limit: float = 1e12,
         ) -> None:
             _validate_lr(lr)
             _validate_momentum(momentum)
             _validate_weight_decay(weight_decay)
+            self.singular_policy = SingularPolicy(singular_policy)
+            self.saturation_limit = float(saturation_limit)
             defaults = {"lr": lr, "momentum": momentum, "weight_decay": weight_decay}
             super().__init__(params, defaults)
+            self.last_scale_state: Optional[ExtendedRatio] = None
+            self.last_scale_event: Optional[SingularArithmeticEvent] = None
 
         def step(self, closure: Optional[Any] = None) -> Optional[Any]:
             loss = closure() if closure is not None else None
@@ -170,6 +229,12 @@ if torch is not None:
                         g = g + weight_decay * p.data
 
                     grad_norm = float(torch.linalg.norm(g))
+                    self.last_scale_state, self.last_scale_event = _extended_division_policy(
+                        lr,
+                        grad_norm,
+                        self.singular_policy,
+                        self.saturation_limit,
+                    )
                     if grad_norm == 0.0:
                         continue
                     num = AbsoluteValue.from_float(lr)
@@ -215,6 +280,8 @@ class AdaptiveEternalOptimizer:
         max_grad_norm: float = 1.0,
         warmup_steps: int = 0,
         total_steps: int = 0,
+        singular_policy: SingularPolicy | str = SingularPolicy.PROPAGATE,
+        saturation_limit: float = 1e12,
     ) -> None:
         _validate_lr(lr)
         _validate_weight_decay(weight_decay)
@@ -233,8 +300,12 @@ class AdaptiveEternalOptimizer:
         self.max_grad_norm = float(max_grad_norm)
         self.warmup_steps = int(warmup_steps)
         self.total_steps = int(total_steps)
+        self.singular_policy = SingularPolicy(singular_policy)
+        self.saturation_limit = float(saturation_limit)
         self.state: Dict[int, Dict[str, Any]] = {}
         self._global_step = 0
+        self.last_clip_state: Optional[ExtendedRatio] = None
+        self.last_clip_event: Optional[SingularArithmeticEvent] = None
 
     @staticmethod
     def _normalize_param_groups(
@@ -296,12 +367,37 @@ class AdaptiveEternalOptimizer:
             return g
         grad_norm = float(torch.linalg.norm(g))
         if grad_norm <= max_norm:
+            self.last_clip_state = ExtendedRatio.from_float(1.0)
+            self.last_clip_event = None
             return g
+        self.last_clip_state, self.last_clip_event = _extended_division_policy(
+            max_norm,
+            grad_norm,
+            self.singular_policy,
+            self.saturation_limit,
+        )
         # ACT-normalised rescale: max_norm / grad_norm via EternalRatio
         num = AbsoluteValue.from_float(max_norm)
         den = AbsoluteValue.from_float(grad_norm)
         scale = EternalRatio(numerator=num, denominator=den).numerical_value()
         return scale * g
+
+    def clip_scale_state(self, grad_norm: float) -> ExtendedRatio:
+        """Return the ExtendedRatio state for ``max_grad_norm / grad_norm``."""
+        return _extended_division_state(self.max_grad_norm, grad_norm)
+
+    def clip_policy_state(
+        self,
+        grad_norm: float,
+        policy: SingularPolicy | str | None = None,
+    ) -> tuple[ExtendedRatio, Optional[SingularArithmeticEvent]]:
+        """Return policy-resolved clipping scale and optional singular event."""
+        return _extended_division_policy(
+            self.max_grad_norm,
+            grad_norm,
+            policy or self.singular_policy,
+            self.saturation_limit,
+        )
 
     def _get_state(self, key: int) -> Dict[str, Any]:
         state = self.state.get(key)

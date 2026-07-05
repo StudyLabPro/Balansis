@@ -2,6 +2,7 @@
 
 import pytest
 
+from balansis import SingularPolicy
 from balansis.ml.optimizer import EternalOptimizer, AdaptiveEternalOptimizer
 
 try:
@@ -62,6 +63,7 @@ class TestEternalOptimizerCreation:
         """Test state dict is initially empty."""
         opt = EternalOptimizer([], lr=1e-3)
         assert opt.state == {}
+        assert opt.last_scale_state is None
 
     def test_get_state_initializes(self):
         """Test _get_state creates initial state."""
@@ -82,6 +84,36 @@ class TestEternalOptimizerCreation:
         """Test step is safe when no parameters have gradients."""
         opt = EternalOptimizer([], lr=1e-3)
         opt.step()  # Should not raise
+
+    def test_scale_state_finite(self):
+        """Test finite scale diagnostics for normal gradient norms."""
+        opt = EternalOptimizer([], lr=2.0)
+        state = opt.scale_state(4.0)
+        assert state.is_finite()
+        assert state.numerical_value() == 0.5
+
+    def test_scale_state_infinite(self):
+        """Test singular scale diagnostics for zero gradient norm."""
+        opt = EternalOptimizer([], lr=2.0)
+        state = opt.scale_state(0.0)
+        assert state.is_infinite()
+        assert state.direction == 1
+
+    def test_scale_policy_state_saturates_zero_norm(self):
+        """Test policy-resolved optimizer scale telemetry."""
+        opt = EternalOptimizer([], lr=2.0, singular_policy=SingularPolicy.SATURATE, saturation_limit=10.0)
+        state, event = opt.scale_policy_state(0.0)
+        assert state.is_finite()
+        assert state.numerical_value() == 10.0
+        assert event is not None
+        assert event.policy == SingularPolicy.SATURATE
+        assert event.saturated
+
+    def test_scale_policy_state_raise_mode(self):
+        """Test fail-fast optimizer scale policy."""
+        opt = EternalOptimizer([], lr=2.0, singular_policy=SingularPolicy.RAISE)
+        with pytest.raises(ValueError, match="compensated_divide_policy produced singular"):
+            opt.scale_policy_state(0.0)
 
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not available")
@@ -136,6 +168,15 @@ class TestEternalOptimizerWithTorch:
         opt.step()
 
         assert torch.equal(param1.data, original1)
+
+    def test_step_tracks_last_scale_state(self):
+        """Test step records the last computed scale state."""
+        param = torch.nn.Parameter(torch.tensor([1.0, 2.0]))
+        param.grad = torch.tensor([0.1, 0.2])
+        opt = EternalOptimizer([param], lr=1e-2)
+        opt.step()
+        assert opt.last_scale_state is not None
+        assert opt.last_scale_state.is_finite()
 
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not available")
@@ -256,6 +297,29 @@ class TestAdaptiveEternalOptimizerCreation:
         """Test step is safe when no parameters have gradients."""
         opt = AdaptiveEternalOptimizer([], lr=1e-3)
         opt.step()  # Should not raise
+
+    def test_clip_scale_state_finite(self):
+        """Test finite clipping diagnostics."""
+        opt = AdaptiveEternalOptimizer([], max_grad_norm=2.0)
+        state = opt.clip_scale_state(4.0)
+        assert state.is_finite()
+        assert state.numerical_value() == 0.5
+
+    def test_clip_scale_state_infinite(self):
+        """Test singular clipping diagnostics for zero gradient norm."""
+        opt = AdaptiveEternalOptimizer([], max_grad_norm=2.0)
+        state = opt.clip_scale_state(0.0)
+        assert state.is_infinite()
+        assert state.direction == 1
+
+    def test_clip_policy_state_saturates_zero_norm(self):
+        """Test policy-resolved clipping telemetry."""
+        opt = AdaptiveEternalOptimizer([], max_grad_norm=2.0, singular_policy="saturate", saturation_limit=8.0)
+        state, event = opt.clip_policy_state(0.0)
+        assert state.is_finite()
+        assert state.numerical_value() == 8.0
+        assert event is not None
+        assert event.saturated
 
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not available")

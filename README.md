@@ -1,4 +1,4 @@
-[![Version](https://img.shields.io/badge/version-0.6.1-blue.svg)](https://github.com/XTeam-Pro/Balansis)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/XTeam-Pro/Balansis)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://python.org)
 [![Coverage](https://img.shields.io/badge/coverage-85%25%2B-brightgreen.svg)](https://github.com/XTeam-Pro/Balansis)
 [![Lean4](https://img.shields.io/badge/Lean4-A1--A5%2C%20E1--E4%2C%20S1--S3%20proved-blueviolet.svg)](./formal/)
@@ -141,6 +141,14 @@ pretending that infinity-like behavior is a normal value.
 pip install balansis
 ```
 
+CLI / pipx install:
+
+```bash
+pipx install balansis
+balansis --version
+balansis doctor
+```
+
 Optional extras:
 
 ```bash
@@ -207,7 +215,7 @@ Continue with:
 
 ## Formal Verification Status
 
-Version `0.6.1` ships a compiled Lean4 formalization on Mathlib `v4.28.0`.
+Version `1.0.0` ships a compiled Lean4 formalization on Mathlib `v4.28.0`.
 
 - `BalansisFormal` is the constructive core
 - `ACT` is the public theorem facade

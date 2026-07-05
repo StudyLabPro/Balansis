@@ -1,3 +1,14 @@
+# Legacy Notice
+
+This file is a non-canonical historical draft.
+
+- Canonical ACT definitions live in `docs/mathematics/`
+- Current theorem mapping lives in `docs/formal/proof-map.md`
+- The current public formal surface is defined by compiled Lean modules
+
+Do not treat the axiomatic or proof wording in this file as the current public
+contract without checking the canonical docs tree and compiled Lean sources.
+
 # Формальные определения Absolute и Eternity: Аксиоматика
 
 ## Определения базовых множеств

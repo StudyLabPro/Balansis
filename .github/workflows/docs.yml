@@ -45,6 +45,10 @@ jobs:
     - name: Check documentation links
       run: |
         python scripts/check_doc_links.py
+
+    - name: Check documentation claim governance
+      run: |
+        python scripts/check_doc_claims.py
         
     - name: Build Sphinx documentation
       run: |

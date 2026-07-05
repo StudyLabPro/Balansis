@@ -32,6 +32,12 @@ A structured ratio object used instead of unstable division edge behavior. In
 the formal layer it is represented through a quotient construction; in the
 runtime layer it is the stable ratio abstraction exposed to Python users.
 
+### ExtendedRatio
+
+The wider runtime ratio object for singular arithmetic. It keeps explicit
+`finite`, `infinite`, and `indeterminate` states when division edge cases must
+be preserved as data instead of rejected immediately.
+
 ### Compensation Factor
 
 The explicit auxiliary value returned by low-level compensated operations to
@@ -83,6 +89,12 @@ identity" when describing the mathematical role in theory or formal proofs.
 Use `EternalRatio` in canonical documentation for the ratio object and its
 formal counterpart. Use `Eternity` only when quoting or describing historical
 materials, old file names, or legacy runtime naming.
+
+### `EternalRatio` vs `ExtendedRatio`
+
+Use `EternalRatio` for the strict finite ratio object. Use `ExtendedRatio` for
+the opt-in runtime surface that represents singular states such as signed
+infinity and indeterminate division results.
 
 ### `BalansisFormal` vs `ACT`
 

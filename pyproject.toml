@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "balansis"
-version = "0.6.1"
-description = "Python library implementing Absolute Compensation Theory (ACT) — stable arithmetic replacing IEEE 754 zero and infinity"
+version = "1.0.0"
+description = "Scientific Python library for explicit compensation, singular arithmetic, and formally audited numerical semantics"
 authors = ["Andrey Tikhonov <andrew@xteam.pro>"]
 license = "AGPL-3.0-only"
 readme = "README.md"
@@ -11,7 +11,7 @@ documentation = "https://github.com/XTeam-Pro/Balansis/tree/main/docs"
 packages = [{include = "balansis"}]
 include = ["balansis/py.typed", "LICENSE", "NOTICE", "LICENSING.md", "COMMERCIAL_LICENSE.md", "CLA.md", "CONTRIBUTING.md", "SECURITY.md", "ORDER_FORM_TEMPLATE.md"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: GNU Affero General Public License v3",
@@ -24,7 +24,10 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
-keywords = ["mathematics", "numerical-stability", "compensation-theory", "absolute", "eternity", "ieee754", "kahan", "agpl"]
+keywords = ["mathematics", "numerical-stability", "compensation-theory", "singular-arithmetic", "formal-verification", "ieee754", "kahan", "agpl"]
+
+[tool.poetry.scripts]
+balansis = "balansis.cli:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -79,7 +82,7 @@ omit = [
     "*/examples/*",
     # Legacy/integration scaffolds with no shipped surface yet. They are
     # tracked separately and excluded so the production coverage gate
-    # reflects only modules that ship as part of v0.6.1.
+    # reflects only modules that ship as part of v1.0.0.
     "balansis/utils/plot.py",
     "balansis/utils/safe.py",
     "balansis/pandas_ext.py",

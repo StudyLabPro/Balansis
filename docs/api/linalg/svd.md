@@ -15,6 +15,19 @@ The result includes:
 - `reconstruction_error`
 - `method`
 - `compensation_factors`
+- `singular_events`
+
+## Singular Policy Telemetry
+
+`svd` accepts the same singular-arithmetic policy vocabulary as `ExtendedRatio`:
+
+- `raise`
+- `propagate`
+- `saturate`
+
+The default is `propagate`, which preserves SVD results while recording
+machine-readable events for zero singular-value ratios. Use
+`result.singular_telemetry()` to export those events.
 
 ## Current Backend
 

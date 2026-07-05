@@ -1,3 +1,14 @@
+# Legacy Notice
+
+This file is a non-canonical historical draft.
+
+- Canonical docs live under `docs/`
+- Current ACT definitions are documented in `docs/mathematics/`
+- Current proof-facing statements are documented in `docs/formal/`
+
+Do not treat the claims in this file as the current Balansis contract without
+checking them against code, proofs, tests, and benchmark artifacts.
+
 # Теория Абсолютной Компенсации (ACT): Обзор
 
 ## Введение

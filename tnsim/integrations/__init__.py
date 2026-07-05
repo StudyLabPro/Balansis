@@ -7,6 +7,6 @@ __all__ = [
     'BalansisCompensator'
 ]
 
-__version__ = '0.6.1'
+__version__ = '1.0.0'
 __author__ = 'TNSIM Team'
 __description__ = 'External library integrations for Zero Sum Theory of Infinite Sets'
