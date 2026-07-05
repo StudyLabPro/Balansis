@@ -9,17 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.0.0] — 2026-07-06 — Stable Release
+
+### Added
+- Promoted Balansis to a stable `1.0.0` package release with production/stable PyPI classifiers
+- Added the `balansis` console entrypoint for `pipx` and CLI smoke checks
+- Added `balansis doctor` and `balansis add` commands for installation verification and basic ACT operations
+- Added `ExtendedRatio` singular arithmetic runtime policy support and high-level telemetry propagation
+- Added runtime-to-Lean parity tests for `ExtendedRatio` semantic laws
+
 ### Changed
-- Reworked repository licensing into a canonical dual-license layout: root `LICENSE` now contains the standard `AGPL-3.0` text, with `LICENSING.md` and `COMMERCIAL_LICENSE.md` documenting the commercial path
-- Added legal support documents: `NOTICE`, `CLA.md`, and contribution guidance aligned with dual licensing
-- Synced README, package metadata, `tnsim` metadata, and release workflow with the active licensing model
-- Corrected outdated formal documentation so theorem names and architecture match the current Lean code
+- Hardened PyPI/TestPyPI release workflow and installation smoke checks across Python 3.10, 3.11, and 3.12
+- Updated installation documentation for `pip`, `pipx`, wheel, and source installs
+- Updated package metadata to describe the stable formal/runtime surface
+- Reworked repository licensing into a canonical dual-license layout with root `LICENSE`, `LICENSING.md`, and `COMMERCIAL_LICENSE.md`
 - Established a visible documentation architecture under `docs/`, moved legacy and research material out of the main canonical path, and redesigned the README as a value-first navigation hub
 
-### Planned
-- Balansis v0.7 (next milestone): stable API, complete `linalg/` (GEMM, SVD, QR), PyTorch integration
-- ACT benchmark suite vs IEEE 754 and Kahan summation
-- LaTeX paper draft for arxiv submission
+### Verified
+- `pip install` from local wheel
+- `pipx install` from local wheel
+- CLI `balansis --version`, `balansis doctor`, and `balansis add`
+- `twine check` for built distributions
+- Lean formal audit through `lake build` and `FormalAudit.lean`
 
 ---
 
@@ -39,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Lean4 Formal Proofs (`formal/`)
 Initial repository integration of the Lean4 ACT formalization using Mathlib.
 This historical entry marks the first formal-proof milestone and was later
-superseded by the stronger `0.6.1` proof architecture, which now builds both
+superseded by the stronger stable proof architecture, which now builds both
 `BalansisFormal` and `ACT` and documents the public theorems A1–A5, E1–E4,
 and S1–S3 directly.
 

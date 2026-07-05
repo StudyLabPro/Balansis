@@ -300,7 +300,7 @@ def build_report() -> dict[str, object]:
     ]
     return {
         "artifact": "claim_closure_baseline",
-        "version": "0.6.1",
+        "version": "1.0.0",
         "scenarios": scenarios,
     }
 

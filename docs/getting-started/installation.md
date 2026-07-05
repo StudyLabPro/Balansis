@@ -9,6 +9,19 @@
 pip install balansis
 ```
 
+## pipx CLI Install
+
+Balansis also ships a small CLI for release smoke checks and basic operations:
+
+```bash
+pipx install balansis
+balansis --version
+balansis doctor
+balansis add 2 3 --json
+```
+
+Use `pipx reinstall balansis` to upgrade an existing isolated CLI install.
+
 ## Extras
 
 ```bash
@@ -28,6 +41,13 @@ pip install balansis[all]
 
 - `pydantic >= 2.5`
 - `numpy >= 1.24`
+
+## Wheel / Local Artifact Install
+
+```bash
+pip install dist/balansis-1.0.0-py3-none-any.whl
+pipx install dist/balansis-1.0.0-py3-none-any.whl
+```
 
 ## From Source
 
