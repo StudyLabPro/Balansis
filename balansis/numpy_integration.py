@@ -10,6 +10,7 @@
 import numpy as np
 from typing import List
 from balansis.core.absolute import AbsoluteValue
+from balansis.core._eft import dot2 as _dot2
 
 absolute_struct_dtype = np.dtype([("magnitude", np.float64), ("direction", np.int8)])
 
@@ -102,12 +103,19 @@ def compensated_array_multiply(a: np.ndarray, b: np.ndarray) -> np.ndarray:
 
 
 def compensated_dot_product(a: np.ndarray, b: np.ndarray) -> float:
-    """Dot product computed with Kahan summation for accumulated precision.
+    """Correctly rounded dot product (Ogita–Rump–Oishi Dot2).
 
-    Standard ``np.dot`` accumulates rounding error proportional to n·ε for an
-    n-element vector.  Kahan summation reduces this to O(ε) regardless of n,
-    which matters for large sparse SNN state vectors where many near-zero
-    products are summed.
+    A dot product loses precision in two places: each product ``a[i]*b[i]``
+    rounds, and the running sum accumulates error. Kahan/Neumaier summation
+    only fixes the second — for an ill-conditioned dot the *product* rounding
+    dominates, so summation compensation alone recovers nothing.
+
+    This implementation captures every product's exact rounding error with the
+    TwoProduct transform and sums the full set of high/low terms with a single
+    correct rounding (:func:`math.fsum`). The result is accurate to full
+    float64 precision regardless of the condition number, as long as the
+    individual products are finite — matching the whitepaper's stability claim
+    for accumulation-heavy workloads such as large sparse state vectors.
 
     Args:
         a: 1-D array (or any shape; will be ravelled), cast to float64.
@@ -116,17 +124,7 @@ def compensated_dot_product(a: np.ndarray, b: np.ndarray) -> float:
     Returns:
         Scalar dot product as Python float.
     """
-    a64 = np.asarray(a, dtype=np.float64).ravel()
-    b64 = np.asarray(b, dtype=np.float64).ravel()
-    products = a64 * b64
-    s = np.float64(0.0)
-    c = np.float64(0.0)
-    for p in products:
-        y = np.float64(p) - c
-        t = s + y
-        c = (t - s) - y
-        s = t
-    return float(s)
+    return _dot2(a, b)
 
 
 def compensated_outer_product(a: np.ndarray, b: np.ndarray) -> np.ndarray:

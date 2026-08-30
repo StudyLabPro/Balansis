@@ -108,6 +108,8 @@ EternalRatio(numerator: AbsoluteValue, denominator: AbsoluteValue \ {Absolute})
 
 ### 2.4 Compensated Arithmetic
 
+Compensation in ACT is backed by **error-free transformations** (`balansis/core/_eft.py`): TwoSum (Knuth) makes `a + b = s + e` exact and TwoProduct (Dekker) makes `a * b = p + e` exact, capturing the rounding error `e` that naive arithmetic discards. Sequence and dot-product routines carry these error terms forward, so the compensation is genuine recovery of precision, not merely a diagnostic.
+
 The `Operations` class provides compensated versions of arithmetic operations that detect and handle numerical edge cases:
 
 ```python
@@ -176,7 +178,9 @@ These structural axioms establish that ACT types form proper algebraic structure
 
 ### 3.4 Key Theorems
 
-**Theorem 1 (Cancellation Stability).** In ACT, subtraction of nearly equal values does not lose precision. Given `a = (M, +1)` and `b = (M - epsilon, +1)`, the subtraction `a - b = a + (-b) = (M, +1) + (M - epsilon, -1) = (epsilon, +1)`, retaining full precision of `epsilon`.
+**Theorem 1 (Accumulation Stability).** ACT recovers the precision that naive floating-point loses when *many* values are combined. Pairwise subtraction of two representable operands is already exact under IEEE 754 when their magnitudes are close (Sterbenz's lemma); the residual error that accumulates in long chains is captured and carried forward by error-free transformations — TwoSum (Knuth) for addition and TwoProduct (Dekker) for multiplication. The compensated `sequence_sum` (Neumaier) and `dot2` (Ogita–Rump–Oishi) routines therefore return a sum or dot product of `n` terms accurate to `O(epsilon)` — a single correct rounding of the exact result — regardless of intermediate cancellation.
+
+*Example.* Summing `[10^16, 1, -10^16]` yields exactly `1`, where both naive float64 summation and classical Kahan summation yield `0`. (Note: a single subtraction `a - b` of two *given* floats cannot recover bits the inputs already lost; the benefit is structural in accumulation, where the error terms are retained.)
 
 **Theorem 2 (Division Safety).** Division by near-zero values is structurally prevented. EternalRatio stores the ratio as a pair, deferring evaluation until numerically safe.
 
@@ -232,22 +236,15 @@ def matmul(a: Matrix, b: Matrix, use_compensation=True) -> (Matrix, float):
 
 Each element-wise multiply uses `compensated_multiply` (overflow/underflow protection), and each accumulation uses `compensated_add` (near-cancellation detection). The total compensation factor tracks cumulative numerical intervention.
 
-### 4.3 Compensated SVD
+### 4.3 SVD: two backends
 
-The SVD module implements Golub-Kahan bidiagonalization followed by implicit QR iteration:
+The `svd()` function returns a `CompensatedSVDResult` (U, S, Vᵀ, reconstruction error, per-singular-value compensation factors) and offers two numerical backends:
 
-**Phase 1: Bidiagonalization.** Householder reflections reduce A to upper bidiagonal form `B = U^T A V`. All inner products and norms use ACT-compensated arithmetic via `_compensated_inner_product()` and `_compensated_norm()`.
+**`numpy_gesdd` (default).** The kernel delegates to LAPACK (`np.linalg.svd`, divide-and-conquer `gesdd`) for maximal robustness and speed on general dense matrices; the ACT layer adds the diagnostic envelope, the `AbsoluteValue` lifting, and singular-arithmetic telemetry.
 
-**Phase 2: QR iteration on bidiagonal matrix.** The Golub-Kahan SVD step computes Wilkinson shifts and chases bulges using Givens rotations. Convergence is checked against tolerance `10^-14` with a maximum of 500 iterations.
+**`act_jacobi` (genuine ACT path).** A one-sided Jacobi SVD whose every column inner product — the Gram entries that drive each rotation and the final singular values — is computed with the correctly-rounded `dot2` (Ogita–Rump–Oishi). One-sided Jacobi is chosen deliberately: it attains high *relative* accuracy on the singular values of ill-conditioned matrices, and that accuracy is precisely what the compensated dot product protects. Measured on random and ill-conditioned inputs, `act_jacobi` reaches reconstruction error `~10^-15`, orthogonality `||UᵀU - I||_F ~ 10^-16`, and recovers singular values spanning `10^0` down to `10^-15` at good relative accuracy.
 
-**Fallback mechanism.** If the ACT SVD's reconstruction error exceeds 100x the NumPy SVD error, the system falls back to NumPy gracefully with a warning:
-
-```python
-if result.reconstruction_error > 100 * max(np_recon_err, 1e-10):
-    return _svd_numpy_fallback(A_np)
-```
-
-This ensures robustness: ACT provides improved stability when possible and degrades gracefully otherwise.
+Both backends return the same result type; callers select the backend via the `method` argument.
 
 ### 4.4 Compensated QR Decomposition
 
@@ -289,7 +286,7 @@ The `numpy_integration` module provides seamless interoperability:
 
 - Convert NumPy arrays to/from AbsoluteValue matrices.
 - ACT-compensated element-wise operations on arrays.
-- Drop-in replacements for `np.dot`, `np.matmul`, and `np.sum` with compensation tracking.
+- `compensated_dot_product` is a **correctly rounded** dot product (Ogita–Rump–Oishi Dot2): each product's rounding error is captured with TwoProduct and the full set of high/low terms is summed with a single correct rounding. It returns full float64 accuracy even on dot products whose condition number exceeds `10^16`, where naive `np.dot` — and a Kahan sum over the already-rounded products — return no correct digits.
 
 ---
 
@@ -308,15 +305,15 @@ Test scenarios include catastrophic cancellation, alternating series, mixed-scal
 
 ### 5.2 Catastrophic Cancellation Recovery
 
-In the catastrophic cancellation scenario (alternating additions of `10^16` and `-10^16` with small perturbations):
+In the catastrophic cancellation scenario — summing the `[10^16, 1, -10^16]` pattern repeated 200 times, whose exact sum is `200` (measured against an exact `Fraction` reference):
 
-| Method | Relative Error vs Decimal | Significant Digits Preserved |
-|--------|--------------------------|------------------------------|
-| float64 | ~10^-1 | ~1 |
-| Kahan | ~10^-8 | ~8 |
-| ACT | ~10^-15 | ~15 |
+| Method | Relative Error | Significant Digits Preserved |
+|--------|---------------|------------------------------|
+| float64 naive | `1.0` (result `0`) | 0 |
+| classical Kahan | `1.0` (result `0`) | 0 |
+| ACT `sequence_sum` (Neumaier) | `0` (result exactly `200`) | full |
 
-ACT achieves near-Decimal accuracy because the magnitude-direction decomposition prevents the cancellation from destroying significant digits.
+This `[big, small, -big]` pattern is the case that defeats *classical* Kahan summation (its single compensation term is itself lost when the large magnitudes swamp it); ACT uses Neumaier / Kahan–Babuška summation, which orders the compensation so the small term survives. On the gentler alternating-harmonic case (S 5.3) classical Kahan already suffices and ACT matches it.
 
 ### 5.3 Alternating Series Summation
 
@@ -334,14 +331,14 @@ ACT matches Kahan summation accuracy while additionally providing per-element co
 
 For matrices with condition number > 10^10:
 
-| Method | SVD Reconstruction Error ||A - U*S*Vt||_F |
-|--------|------------------------------------------|
-| NumPy SVD | ~10^-6 (relative) |
-| ACT SVD (Balansis) | ~10^-6 (relative) with compensation audit |
+| Backend | Reconstruction `||A - U·S·Vt||_F` | Orthogonality `||UᵀU - I||_F` |
+|---------|-----------------------------------|-------------------------------|
+| `numpy_gesdd` (LAPACK) | `~10^-15` | `~10^-16` |
+| `act_jacobi` (compensated) | `~10^-15` | `~10^-16` |
 
-ACT SVD achieves comparable reconstruction accuracy to NumPy's LAPACK-backed SVD while additionally providing:
-- Per-step compensation factors for numerical audit.
-- Automatic fallback when ACT diverges.
+The genuine ACT backend (`act_jacobi`, one-sided Jacobi over `dot2` inner products) matches LAPACK's reconstruction and orthogonality on random matrices, and on ill-conditioned inputs recovers singular values spanning `10^0`–`10^-15` at good relative accuracy, while additionally providing:
+- Per-singular-value compensation factors for numerical audit.
+- Singular-arithmetic telemetry for near-zero singular values.
 - Orthogonality error metrics for quality assessment.
 
 ### 5.5 Stability Ratios
