@@ -13,7 +13,6 @@ surface.
 In this repository, research material includes:
 
 - whitepaper drafts
-- patent-oriented drafts
 - exploratory theory writeups
 - future-looking claims not yet promoted into canonical docs
 
@@ -57,7 +56,6 @@ An idea moves from research into canonical documentation only when:
 ## Current Research Materials
 
 - `ACT_WHITEPAPER_v1.md`
-- `PATENT_DRAFT_ACT.md`
 
 These files remain useful, but they should be read through the boundary defined
 on this page.

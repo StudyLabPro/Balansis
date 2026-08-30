@@ -8,7 +8,6 @@ This section contains useful but non-canonical research-oriented material.
 ## Current Materials
 
 - `ACT_WHITEPAPER_v1.md`
-- `PATENT_DRAFT_ACT.md`
 
 ## Canonical Boundary
 
