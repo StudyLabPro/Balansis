@@ -24,3 +24,11 @@ htmlcov/
 .lake/
 lake-packages/
 lake-manifest.json
+
+# --- slp-hardening ---
+.env
+.env.*
+!.env.example
+.trae/
+.claude/
+.codex/
