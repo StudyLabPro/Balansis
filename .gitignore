@@ -32,3 +32,14 @@ lake-manifest.json
 .trae/
 .claude/
 .codex/
+
+# Packaging / build output
+dist/
+build/
+
+# Rust (balansis_native)
+balansis_native/target/
+balansis_native/Cargo.lock
+
+# OS
+.DS_Store

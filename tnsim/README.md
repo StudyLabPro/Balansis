@@ -29,7 +29,7 @@
 ### Installation from source
 
 ```bash
-git clone https://github.com/XTeam-Pro/Balansis.git
+git clone https://github.com/StudyLabPro/Balansis.git
 cd Balansis
 pip install -e .
 ```

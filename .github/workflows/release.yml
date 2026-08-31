@@ -130,7 +130,7 @@ jobs:
           subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
           subprocess.check_call([sys.executable, '-m', 'pip', 'install', str(wheels[0])])
           PY
-          python -c "import balansis; assert balansis.__version__ == '1.0.0'; print(balansis.__version__)"
+          python -c "import balansis; assert balansis.__version__ == '1.1.0'; print(balansis.__version__)"
           balansis --version
           balansis doctor
 

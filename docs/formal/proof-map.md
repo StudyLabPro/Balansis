@@ -90,7 +90,7 @@ The public smoke audit currently checks at least these representative items:
 - `Field ACT.AbsoluteValue`
 - `Field ACT.EternalRatio`
 
-See [FormalAudit.lean](file:///root/StudyNinja-Eco/projects/Balansis/formal/FormalAudit.lean).
+See [FormalAudit.lean](../../formal/FormalAudit.lean).
 
 ## Verification Commands
 

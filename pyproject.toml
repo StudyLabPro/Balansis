@@ -5,9 +5,9 @@ description = "Scientific Python library for explicit compensation, singular ari
 authors = ["Andrey Tikhonov <andrew@xteam.pro>"]
 license = "AGPL-3.0-only"
 readme = "README.md"
-homepage = "https://github.com/XTeam-Pro/Balansis"
-repository = "https://github.com/XTeam-Pro/Balansis"
-documentation = "https://github.com/XTeam-Pro/Balansis/tree/main/docs"
+homepage = "https://github.com/StudyLabPro/Balansis"
+repository = "https://github.com/StudyLabPro/Balansis"
+documentation = "https://github.com/StudyLabPro/Balansis/tree/master/docs"
 packages = [{include = "balansis"}]
 include = ["balansis/py.typed", "LICENSE", "NOTICE", "LICENSING.md", "COMMERCIAL_LICENSE.md", "CLA.md", "CONTRIBUTING.md", "SECURITY.md", "ORDER_FORM_TEMPLATE.md"]
 classifiers = [
@@ -84,7 +84,6 @@ omit = [
     # tracked separately and excluded so the production coverage gate
     # reflects only modules that ship as part of v1.1.0.
     "balansis/utils/plot.py",
-    "balansis/utils/safe.py",
     "balansis/pandas_ext.py",
     "balansis/vectorized.py",
     "balansis/arrow_integration.py",

@@ -2,13 +2,14 @@
 
 ## Supported Versions
 
-Balansis follows a best-effort support model until `1.0.0`, with security
-fixes prioritized for the newest maintained line.
+Balansis is on the stable `1.x` line and follows [Semantic Versioning](https://semver.org/).
+Security fixes are prioritized for the newest maintained release.
 
 | Version line | Security support |
 |--------------|------------------|
-| `0.6.x` | Supported |
-| Older than `0.6.x` | Not supported |
+| `1.1.x` (current) | Supported |
+| `1.0.x` | Supported (best effort) |
+| Older than `1.0.0` | Not supported |
 | Unreleased development branches | Best effort only |
 
 `tnsim` is maintained inside the same repository and follows the same policy

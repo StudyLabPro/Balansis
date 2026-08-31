@@ -20,9 +20,9 @@ Usage example:
 # Package version
 __version__ = "1.0.0"
 __author__ = "TNSIM Team"
-__email__ = "contact@tnsim.org"
+__email__ = "andrew@xteam.pro"
 __description__ = "Theory of Zero-Sum Infinite Sets"
-__url__ = "https://github.com/tnsim/tnsim"
+__url__ = "https://github.com/StudyLabPro/Balansis"
 __license__ = "AGPL-3.0 / Commercial via parent Balansis repository"
 
 # Import main classes

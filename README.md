@@ -1,6 +1,6 @@
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/XTeam-Pro/Balansis)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/StudyLabPro/Balansis)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://python.org)
-[![Coverage](https://img.shields.io/badge/coverage-85%25%2B-brightgreen.svg)](https://github.com/XTeam-Pro/Balansis)
+[![Coverage](https://img.shields.io/badge/coverage-85%25%2B-brightgreen.svg)](https://github.com/StudyLabPro/Balansis)
 [![Lean4](https://img.shields.io/badge/Lean4-A1--A5%2C%20E1--E4%2C%20S1--S3%20proved-blueviolet.svg)](./formal/)
 [![License](https://img.shields.io/badge/license-AGPL--3.0%20%2F%20Commercial-blue.svg)](./LICENSING.md)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -287,4 +287,4 @@ Copyright (c) 2024-2026 Andrey Tikhonov (XTeam-Pro). All rights reserved.
 
 ---
 
-Balansis is part of the [StudyNinja-Eco](https://github.com/XTeam-Pro/StudyNinja-Eco) ecosystem.
+Balansis is part of the [StudyNinja-Eco](https://github.com/StudyLabPro/StudyNinja-Eco) ecosystem.

@@ -11,7 +11,7 @@ major package areas relate to each other.
 
 The main Python package is `balansis/`.
 
-High-level entrypoints are re-exported from [__init__.py](file:///root/StudyNinja-Eco/projects/Balansis/balansis/__init__.py), including:
+High-level entrypoints are re-exported from [__init__.py](../../balansis/__init__.py), including:
 
 - `AbsoluteValue`
 - `EternalRatio`

@@ -52,7 +52,7 @@ pipx install dist/balansis-1.1.0-py3-none-any.whl
 ## From Source
 
 ```bash
-git clone https://github.com/XTeam-Pro/Balansis.git
+git clone https://github.com/StudyLabPro/Balansis.git
 cd Balansis
 poetry install
 ```
