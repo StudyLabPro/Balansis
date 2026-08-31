@@ -67,14 +67,17 @@ It performs:
 1. version and changelog validation
 2. license document validation
 3. Python release smoke tests
-4. Lean formal audit
-5. wheel and sdist build
-6. `twine check`
-7. pip install smoke checks on Linux/macOS/Windows and Python 3.10/3.11/3.12
-8. pipx install smoke checks on Linux
-9. TestPyPI publication
-10. PyPI publication
-11. GitHub Release creation
+4. wheel and sdist build
+5. `twine check`
+6. pip install smoke checks on Linux/macOS/Windows and Python 3.10/3.11/3.12
+7. pipx install smoke checks on Linux
+8. TestPyPI publication
+9. PyPI publication
+10. GitHub Release creation
+
+Affected Lean sources are built and audited by `Release Validation` when they
+merge to `master`. Run the manual `Heavy Validation` formal scope before a tag
+when an additional full formal check is required.
 
 Required GitHub secrets:
 

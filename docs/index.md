@@ -9,7 +9,7 @@ Balansis documentation is organized by audience and by task:
 - **Decision makers:** start with [Why Balansis](getting-started/why-balansis.md)
 - **Developers:** start with [Quick Start](getting-started/quickstart.md) and [API Reference](api/index.md)
 - **Researchers:** start with [Mathematics](mathematics/index.md) and [Formal Verification](formal/overview.md)
-- **Contributors:** start with [Contributing](../CONTRIBUTING.md), [Release Process](release.md), [Documentation Standards](standards.md), and [Contributor Docs](contributor/development-setup.md)
+- **Contributors:** start with [Contributing](../CONTRIBUTING.md), [GitHub Repository Standard](GITHUB_REPOSITORY_STANDARD.md), [Release Process](release.md), [Documentation Standards](standards.md), and [Contributor Docs](contributor/development-setup.md)
 
 ## Sections
 
@@ -30,6 +30,7 @@ Balansis documentation is organized by audience and by task:
 ## Documentation Governance
 
 - [Glossary](glossary.md): canonical terminology and naming boundaries
+- [GitHub Repository Standard](GITHUB_REPOSITORY_STANDARD.md): branches, pull requests, CI cost controls, release boundaries, and agent rules
 - [Documentation Standards](standards.md): file, language, linking, and governance rules
 - [Reading Paths](concepts/reading-paths.md): audience-specific routes through the docs tree
 

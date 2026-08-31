@@ -24,6 +24,7 @@ Read these documents first:
 - [README.md](README.md)
 - [docs/index.md](docs/index.md)
 - [docs/standards.md](docs/standards.md)
+- [docs/GITHUB_REPOSITORY_STANDARD.md](docs/GITHUB_REPOSITORY_STANDARD.md)
 - [LICENSING.md](LICENSING.md)
 - [CLA.md](CLA.md)
 - [SECURITY.md](SECURITY.md)
@@ -97,7 +98,7 @@ lake build ACT
 Recommended process:
 
 1. Open an issue for large changes.
-2. Create a focused branch from `main`.
+2. Create a focused branch from `master`.
 3. Keep commits small and reviewable.
 4. Add or update tests when the change affects behavior.
 5. Update relevant docs in the same pull request.
