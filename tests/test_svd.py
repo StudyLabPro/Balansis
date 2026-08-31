@@ -203,10 +203,15 @@ class TestSVDSpecialCases:
 
     def test_rank_deficient_svd_records_singular_telemetry(self):
         """Rank-deficient matrices expose singular-value policy telemetry."""
+        # Diagonal rank-2 matrix: singular values are exactly [3, 1, 0] on every
+        # LAPACK build, so the zero singular value deterministically triggers one
+        # singular-arithmetic event. A non-diagonal rank-deficient matrix can
+        # instead yield a ~1e-15 "zero", which lands on the near-zero threshold
+        # boundary and makes this assertion flaky across NumPy/LAPACK versions.
         A = np.array([
-            [1.0, 2.0, 3.0],
-            [2.0, 4.0, 6.0],
-            [3.0, 6.0, 9.0],
+            [3.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0],
         ])
         result = svd(_make_matrix(A))
         telemetry = result.singular_telemetry()
