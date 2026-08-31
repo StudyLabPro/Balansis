@@ -190,13 +190,21 @@ These structural axioms establish that ACT types form proper algebraic structure
 
 ### 3.5 Lean4 Formalization
 
-The axioms are formally stated in Lean4 across three files:
+The axioms are formally **proved** (not merely stated) in Lean4 against Mathlib.
+A `BalansisFormal` layer defines the types and their operations by mapping to ℝ
+(`fromReal ∘ toReal`), so A1–A5, E1–E4 and S1–S3 are discharged from the real
+numbers' own algebra; the `ACT` layer re-exports them as public theorems:
 
 | File | Contents |
 |------|----------|
 | `formal/ACT/Absolute.lean` | AbsoluteValue type, operations, axioms A1-A5 |
-| `formal/ACT/Eternity.lean` | EternalRatio type, operations, axioms E1-E4 |
-| `formal/ACT/Algebra.lean` | Algebraic structure axioms S1-S3 |
+| `formal/ACT/EternalRatio.lean` | EternalRatio type, operations, axioms E1-E4 |
+| `formal/ACT/Algebra.lean` | Structural axioms S1-S3, `Field EternalRatio` instance |
+
+The development builds with no `sorry`/`admit`/added `axiom`; `#print axioms`
+shows every theorem depends only on the standard `propext`, `Classical.choice`,
+`Quot.sound`. These proofs verify the **algebra** of the idealized model; the
+numerical-stability behaviour is validated empirically (Section 5), not in Lean.
 
 ---
 
@@ -462,10 +470,15 @@ Absolute Compensation Theory provides a principled foundation for numerically st
 - Compensated eigenvalue decomposition.
 - Iterative solvers (CG, GMRES) with ACT compensation.
 
-**Formal verification.** Complete the Lean4 proofs:
-- Fill remaining `sorry` holes in complex proofs (distributivity, associativity).
-- Machine-checked proof of the group homomorphism theorem.
-- Proof of cancellation stability bounds.
+**Formal verification.** The algebraic layer is complete: the Lean4 development
+(`formal/`, against Mathlib) builds with **no `sorry`, `admit`, or added
+`axiom`**, and `#print axioms` confirms every A/E/S theorem — including the
+`Field EternalRatio` instance — depends only on Lean's three standard axioms
+(`propext`, `Classical.choice`, `Quot.sound`). What remains is genuinely open:
+- Formalize the *floating-point* error bounds (the current proofs establish the
+  algebra of the idealized real-valued model, not the `float64` stability
+  results, which are validated empirically in the test suite).
+- Machine-checked accuracy bounds for the compensated summation / dot product.
 
 **Language ecosystem.** Extend beyond Python:
 - TypeScript implementation for financial applications.
