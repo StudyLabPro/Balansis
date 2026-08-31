@@ -29,8 +29,6 @@ maintainable as the repository grows.
   - benchmark scripts in `benchmarks/`
   - Lean code in `formal/`
   - TNSIM runtime code in `tnsim/`
-- Hidden `.trae` files are internal working material and cannot act as public
-  canonical documentation.
 
 ## Required Metadata
 

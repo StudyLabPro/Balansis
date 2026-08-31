@@ -68,4 +68,3 @@ Before finishing a documentation change:
 - development setup: [development-setup.md](development-setup.md)
 - terminology rules: [Glossary](../glossary.md)
 - standards: [Documentation Standards](../standards.md)
-- backlog: [Documentation Backlog](../architecture/documentation-backlog.md)

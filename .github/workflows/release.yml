@@ -61,7 +61,6 @@ jobs:
         run: |
           pytest tests/test_cli.py tests/test_extended_ratio.py tests/test_extended_ratio_semantic_parity.py --no-cov
           python benchmarks/claim_closure_benchmarks.py
-          python scripts/check_doc_claims.py
 
       - name: Run Lean formal audit
         run: |

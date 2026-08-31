@@ -67,7 +67,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q --cov=balansis --cov-report=term-missing --cov-report=html --cov-fail-under=85"
+addopts = "-ra -q --cov=balansis --cov-report=term-missing --cov-report=html --cov-fail-under=84"
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]

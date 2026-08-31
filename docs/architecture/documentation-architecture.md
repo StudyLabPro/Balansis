@@ -18,7 +18,6 @@ Balansis documentation follows a domain-based structure.
 
 - `docs/research/`: exploratory or publication-oriented material
 - `docs/archive/legacy/`: retained historical documents
-- `.trae/`: internal working material only, never the public source of truth
 
 ## Design Rules
 

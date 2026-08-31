@@ -51,4 +51,3 @@ rules.
 
 - terminology: [Glossary](../glossary.md)
 - docs home: [Documentation Index](../index.md)
-- backlog and future work: [Documentation Backlog](../architecture/documentation-backlog.md)

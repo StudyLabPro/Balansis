@@ -2,9 +2,9 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ master ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ master ]
   schedule:
     # Запуск каждый день в 2:00 UTC для проверки зависимостей
     - cron: '0 2 * * *'
