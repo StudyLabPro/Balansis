@@ -11,6 +11,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] — 2026-08-31 — Honest Numerics Edition
+
+This release makes the numerical core genuinely deliver the accuracy the
+whitepaper describes, replaces a placeholder dot-product implementation with a
+correctly-rounded one, adds a real ACT-compensated SVD backend, and aligns all
+research documentation with what the code and the Lean proofs actually verify.
+No patents are pursued; all patent material has been removed.
+
+### Added
+- `balansis/core/_eft.py` — error-free transforms: `two_sum` (Knuth/Møller),
+  `two_product` (Dekker split, FMA-free), `two_product_arr`, and Ogita–Rump–Oishi
+  `dot2` (correctly-rounded dot product via a single `math.fsum` over all
+  high/low product terms) plus `comp_sum`. This is the honest numerical kernel.
+- Genuine ACT-compensated SVD backend `svd(A, method="act_jacobi")`: a one-sided
+  Jacobi SVD whose Gram inner products are computed with `dot2`, attaining high
+  *relative* accuracy on the singular values of ill-conditioned matrices.
+  `numpy_gesdd` (LAPACK) remains the default backend.
+- `tests/test_act_accuracy.py` — accuracy regression tests that lock the
+  whitepaper's summation (§5.2/5.3), dot-product (§4.6) and SVD (§4.3) claims
+  against exact `fractions.Fraction` / NumPy references.
+
+### Changed
+- `numpy_integration.compensated_dot_product` now returns the correctly-rounded
+  `dot2` result. The previous implementation summed naively-rounded products and
+  recovered **zero** correct digits on ill-conditioned dot products; it now
+  matches the exact result to full float64 precision regardless of condition
+  number (as long as individual products are finite).
+- `docs/research/ACT_WHITEPAPER_v1.md` reconciled with measured behaviour:
+  Theorem 1 reframed as accumulation stability (pairwise recovery is impossible
+  by the Sterbenz lemma); §4.3 documents the two real SVD backends (removing the
+  earlier Golub–Kahan claim); §4.6 documents the correctly-rounded Dot2; §5.2/§5.4
+  tables carry the measured figures; §3.5/§8.2 state precisely what Lean proves
+  (the algebra of the ℝ-isomorphic idealized model, `sorry`-free, `#print axioms`
+  clean) versus what is validated empirically (float64 stability).
+
+### Removed
+- `docs/research/PATENT_DRAFT_ACT.md` and all patent references from the research
+  index and scope documents. Balansis pursues no patent; the work is released
+  under the existing dual AGPL-3.0 / commercial license.
+
+### Verified
+- Lean4 formal audit: `lake build` completes with **0 errors / 0 `sorry`**
+  (8041 jobs) on Mathlib `v4.28.0`; `#print axioms` on A1/A3, S1–S3 and the
+  `Field EternalRatio` instance shows only `[propext, Classical.choice, Quot.sound]`
+  — no `sorryAx`.
+- `tests/test_act_accuracy.py` passes: TwoSum/TwoProduct exact vs `Fraction`;
+  `dot2` and `compensated_dot_product` recover a condition-~1e17 dot product to
+  <1e-14 relative error where naive `np.dot` exceeds 1e-2; `act_jacobi` SVD
+  reconstruction/orthogonality <1e-12 and small-singular-value relative accuracy
+  within 10%.
+
+---
+
 ## [1.0.0] — 2026-07-06 — Stable Release
 
 ### Added

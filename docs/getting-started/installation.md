@@ -45,8 +45,8 @@ pip install balansis[all]
 ## Wheel / Local Artifact Install
 
 ```bash
-pip install dist/balansis-1.0.0-py3-none-any.whl
-pipx install dist/balansis-1.0.0-py3-none-any.whl
+pip install dist/balansis-1.1.0-py3-none-any.whl
+pipx install dist/balansis-1.1.0-py3-none-any.whl
 ```
 
 ## From Source

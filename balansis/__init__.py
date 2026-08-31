@@ -46,7 +46,7 @@ from balansis.sets.generators import harmonic_generator, grandis_generator
 from balansis.compat import CompensatedSum, StableSoftmax, CompensatedMatMul
 # from balansis.utils.plot import PlotUtils  # Temporarily disabled
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "Andrey Tikhonov (XTeam-Pro)"
 __email__ = "andrew@xteam.pro"
 __license__ = "AGPL-3.0 / Commercial — see LICENSE, LICENSING.md, and COMMERCIAL_LICENSE.md"

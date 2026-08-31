@@ -9,7 +9,7 @@ library API (`pip install balansis`) and a CLI entrypoint (`pipx install balansi
 ## Current Stable Release
 
 - Package: `balansis`
-- Version: `1.0.0`
+- Version: `1.1.0`
 - Python: `3.10`, `3.11`, `3.12`
 - Distribution formats: wheel and sdist
 - CLI command: `balansis`
@@ -39,8 +39,8 @@ Verify local `pip` install:
 ```bash
 .release-venv/bin/python -m venv .pip-install-venv
 .pip-install-venv/bin/python -m pip install --upgrade pip
-.pip-install-venv/bin/python -m pip install dist/balansis-1.0.0-py3-none-any.whl
-.pip-install-venv/bin/python -c "import balansis; assert balansis.__version__ == '1.0.0'"
+.pip-install-venv/bin/python -m pip install dist/balansis-1.1.0-py3-none-any.whl
+.pip-install-venv/bin/python -c "import balansis; assert balansis.__version__ == '1.1.0'"
 .pip-install-venv/bin/balansis --version
 .pip-install-venv/bin/balansis doctor
 ```
@@ -48,9 +48,9 @@ Verify local `pip` install:
 Verify local `pipx` install:
 
 ```bash
-.release-venv/bin/pipx install --force dist/balansis-1.0.0-py3-none-any.whl
+.release-venv/bin/pipx install --force dist/balansis-1.1.0-py3-none-any.whl
 .release-venv/bin/pipx runpip balansis show balansis
-.release-venv/bin/pipx run --spec dist/balansis-1.0.0-py3-none-any.whl balansis --version
+.release-venv/bin/pipx run --spec dist/balansis-1.1.0-py3-none-any.whl balansis --version
 ```
 
 ## Publishing
@@ -84,8 +84,8 @@ Required GitHub secrets:
 ## Tagging
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.1.0
+git push origin v1.1.0
 ```
 
 Do not reuse a PyPI version after upload. If a published release must be fixed,
