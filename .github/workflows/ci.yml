@@ -59,6 +59,8 @@ jobs:
 
       - name: Audit Lean sources (no axiom / sorry / admit)
         run: |
-          ! grep -Rnw formal --include='*.lean' -e '\baxiom\b'
-          ! grep -Rnw formal --include='*.lean' -e '\bsorry\b'
-          ! grep -Rnw formal --include='*.lean' -e '\badmit\b'
+          # Scan only the project's own Lean sources, not the fetched
+          # dependency tree under formal/.lake/ (Mathlib legitimately uses axioms).
+          ! grep -Rnw formal --include='*.lean' --exclude-dir='.lake' -e '\baxiom\b'
+          ! grep -Rnw formal --include='*.lean' --exclude-dir='.lake' -e '\bsorry\b'
+          ! grep -Rnw formal --include='*.lean' --exclude-dir='.lake' -e '\badmit\b'
