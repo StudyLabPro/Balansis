@@ -50,6 +50,8 @@ def _changed_markdown(base: str, head: str) -> list[str]:
 
 
 def _markdown_files(requested: list[str], *, changed_only: bool) -> list[Path]:
+    if changed_only and not requested:
+        return []
     if requested:
         files = [(ROOT / path).resolve() for path in requested]
     else:
